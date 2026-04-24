@@ -1,5 +1,5 @@
 # 💫 About Me:
-Hey, this is Prottoy!<br>A professional noob on a daily quest, trying not to break everything in the process. Tech enthusiast? Absolutely.<br><br>I love making projects. Trial, error, commit, cry, repeat. Never trust your own code at 2 AM.<br><br>Feel free to roast my code.<br>Currently learning how software is actually created, one bug at a time.
+Trial, error, commit, cry, repeat. Never trust your own code at 2 AM.
 
 
 ## 🌐 Socials:
