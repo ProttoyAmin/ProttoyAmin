@@ -25,3 +25,43 @@ Trial, error, commit, cry, repeat. Never trust your own code at 2 AM.
 [![](https://komarev.com/ghpvc/?username=ProttoyAmin&icon=5&color=0)](https://visitcount.itsvg.in)
 
 <!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
+
+---
+
+# 🛠️ Portfolio Platform
+
+This repository also contains the **production portfolio platform** — a
+single-page public site with an owner-only admin panel for managing every
+piece of content.
+
+| | |
+|---|---|
+| **Stack** | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Motion (Framer Motion) |
+| **Database** | MongoDB Atlas + Mongoose 9, behind a repository layer with a local file driver for development |
+| **Media** | Cloudinary (free tier) with a local-disk fallback |
+| **Admin** | Tabbed panel at `/admin` — projects, experience, skills, writing, messages, media, settings |
+| **Access** | Only the account in `settings.ownerEmail` can sign in — enforced on the server, on every request |
+
+### Quick start
+
+```bash
+npm install
+npm run dev
+```
+
+- Portfolio → <http://localhost:3000>
+- Admin → <http://localhost:3000/admin> (`md.jahid.bin.amin@gmail.com` / `portfolio-admin` in development)
+
+No cloud account is required to run it: the app falls back to a local JSON
+store seeded with demo content, and shows a banner instead of crashing when
+credentials are missing.
+
+### Documentation
+
+| Document | Contents |
+|---|---|
+| [`docs/SETUP.md`](docs/SETUP.md) | Boot, MongoDB Atlas, Cloudinary, deployment, troubleshooting |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System design, stack, rendering model, motion system |
+| [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) | Collections, fields, indexes, demo-content contract |
+| [`docs/SECURITY.md`](docs/SECURITY.md) | Ownership enforcement, threat model, hardening |
+| [`docs/PLAN.md`](docs/PLAN.md) | Build phases and acceptance criteria |

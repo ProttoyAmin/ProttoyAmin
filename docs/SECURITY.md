@@ -9,8 +9,8 @@
 
 | Zone | Trust | Contains |
 |---|---|---|
-| **Public** | Untrusted | `/` one-pager, `/api/contact`, public tRPC reads, static assets |
-| **Admin** | Privileged | `/admin/**`, `/api/admin/**`, protected tRPC procedures |
+| **Public** | Untrusted | `/` one-pager, `/api/contact`, static assets |
+| **Admin** | Privileged | `/admin/**`, admin server actions and admin route handlers |
 | **Owner** | Fully trusted | The single account whose email equals `settings.ownerEmail` |
 | **Data** | Trusted | MongoDB Atlas, Cloudinary, Resend |
 
@@ -45,15 +45,15 @@ export async function requireOwner(): Promise<SessionUser> {
 
 ### Defence in depth — four layers
 
-1. **Middleware** (`src/middleware.ts`)
+1. **Network boundary** (`src/proxy.ts`)
    - Matches `/admin/:path*` and `/api/admin/:path*`.
    - No session → redirect `/admin/login`.
    - Session present but not owner → `403` (never redirect-loop; the login page shows "not authorised").
-   - Middleware uses **only** the JWT payload (fast, edge-compatible) — it is a routing filter, not the boundary.
+   - The proxy uses **only** the JWT payload — it is a routing filter, not the boundary.
 
 2. **Layout guard** — `(admin)/admin/layout.tsx` calls `requireOwner()` on the server; the admin shell never renders without it.
 
-3. **Data-layer guard** — `requireOwner()` is the first line of **every** admin server action, protected tRPC procedure, and admin route handler. A bug in the UI that calls an action directly still gets a 403.
+3. **Data-layer guard** — `requireOwner()` is the first line of **every** admin server action and admin route handler. A bug in the UI that calls an action directly still gets a 403.
 
 4. **Audit** — each rejected attempt and each successful mutation is recorded.
 
@@ -95,7 +95,7 @@ The limiter is an in-process implementation behind a `RateLimiter` interface, so
 
 | Layer | Rule |
 |---|---|
-| Boundary validation | Every server action / tRPC input passes a **Zod** schema before touching the data layer; unknown keys are stripped |
+| Boundary validation | Every server action and route-handler input passes a **Zod** schema before touching the data layer; unknown keys are stripped |
 | Output shaping | Repository `select` projections return only fields the UI needs — no password hashes or secrets in responses |
 | Markdown | Blog/admin markdown is rendered with a sanitizer (`rehype-sanitize`) — no raw HTML, no script injection |
 | Rich text | No WYSIWYG HTML storage; markdown only |
@@ -141,7 +141,7 @@ Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 ## 8. Data protection
 
 - Secrets live only in environment variables (`.env.local` is git-ignored; `.env.example` holds placeholders only).
-- Password hashes never leave the server; tRPC responses are serialised through explicit `select` shapes.
+- Password hashes never leave the server; repository reads project only the fields the UI needs.
 - Sessions are server-revocable via `tokenVersion`.
 - Audit log records actor, action, entity, timestamp and IP for every admin mutation.
 - Contact-form messages store only what the visitor typed; optional TTL purge after 90 days.
