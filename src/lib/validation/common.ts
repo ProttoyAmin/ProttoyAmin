@@ -22,8 +22,13 @@ export const urlSchema = z
   .trim()
   .max(500, "URL is too long")
   .refine(
-    (value) => value === "" || /^https?:\/\//i.test(value),
-    "Must start with http:// or https://",
+    (value) =>
+      value === "" ||
+      /^https?:\/\//i.test(value) ||
+      // Social links often point at an address rather than a page.
+      /^mailto:/i.test(value) ||
+      /^tel:/i.test(value),
+    "Must start with http://, https://, mailto: or tel:",
   );
 
 export const nonEmptyString = (label: string, max = 300) =>

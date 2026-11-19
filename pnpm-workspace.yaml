@@ -1,5 +1,0 @@
-allowBuilds:
-  esbuild: false
-minimumReleaseAgeExclude:
-  - jose@6.2.18
-  - lucide-react@1.76.0

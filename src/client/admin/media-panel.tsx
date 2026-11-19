@@ -3,20 +3,20 @@
    refuses to optimise; the images are served as-is by design. */
 "use client";
 
-import { Copy, Trash2, Upload } from "lucide-react";
+import { Copy, Trash2, Upload } from "@/components/ui/icons";
 import * as React from "react";
 import { toast } from "sonner";
 
 import { ImagePicker } from "@/client/admin/image-picker";
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { MediaData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buildDeliveryUrl } from "@/lib/media-url";
 import type { ImageAsset } from "@/server/types";
 
-export function MediaPanel({ data }: { data: AdminData }) {
+export function MediaPanel({ data }: { data: MediaData }) {
   const { pending, run } = useServerAction();
   const [uploaded, setUploaded] = React.useState<ImageAsset | undefined>();
 
@@ -116,7 +116,8 @@ export function MediaPanel({ data }: { data: AdminData }) {
 
       <p className="flex items-center gap-2 text-xs text-muted">
         <Upload className="h-3.5 w-3.5" />
-        Uploads are served through {data.runtime.media.driver === "cloudinary"
+        Uploads are served through{" "}
+        {data.runtime.media.driver === "cloudinary"
           ? "Cloudinary with automatic format and quality optimisation"
           : "the local disk driver — add Cloudinary credentials to switch"}
         .

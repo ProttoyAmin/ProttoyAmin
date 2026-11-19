@@ -3,7 +3,7 @@
    refuses to optimise; the images are served as-is by design. */
 "use client";
 
-import { Loader2, Trash2, Upload } from "lucide-react";
+import { Loader2, Trash2, Upload } from "@/components/ui/icons";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -69,7 +69,10 @@ export function ImagePicker({
         throw new Error("The upload was rejected by the media provider");
       }
 
-      const uploaded = (await uploadResponse.json()) as { public_id?: string; publicId?: string };
+      const uploaded = (await uploadResponse.json()) as {
+        public_id?: string;
+        publicId?: string;
+      };
       const publicId = uploaded.public_id ?? uploaded.publicId;
       if (!publicId) throw new Error("The provider did not return an asset id");
 
@@ -122,9 +125,7 @@ export function ImagePicker({
             <Input
               placeholder="Alt text"
               defaultValue={value.alt ?? ""}
-              onChange={(event) =>
-                onChange({ ...value, alt: event.target.value })
-              }
+              onChange={(event) => onChange({ ...value, alt: event.target.value })}
             />
             <div className="flex gap-2">
               <Button

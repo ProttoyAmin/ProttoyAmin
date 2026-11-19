@@ -10,7 +10,7 @@
 
 ### Goals
 1. A **single-page** public portfolio (`/`) — modern, minimal, animation-rich but restrained.
-2. A **tabbed admin panel** (`/admin`) where the owner uploads and manages every piece of content.
+2. An **admin panel** (`/admin/**`) where the owner uploads and manages every piece of content — one page per concern.
 3. **Strict ownership**: only the account named in `settings.ownerEmail` may enter the admin panel. No other account, no role, no email, ever.
 4. **Production-ready**: typed end-to-end, tested, CI-gated, deployable to Vercel with no code changes.
 5. **Runs with zero cloud credentials**: a local memory/file driver backs dev, CI and preview environments, so the repo clones and runs without Atlas or Cloudinary accounts.
@@ -101,7 +101,8 @@ src/
 │   ├── db/                         # connection, models, adapters, registry
 │   ├── media/                      # storage contract + cloudinary/local drivers
 │   ├── repositories/               # repository contracts + factory
-│   ├── services/                   # content resolution, audit log
+│   ├── security/                   # CSP construction
+│   ├── services/                   # content resolution, audit log, tagged cache
 │   └── types.ts                    # domain entities
 ├── lib/                            # isomorphic helpers (cn, slug, format, zod schemas, media urls)
 ├── seed/dummy.ts                   # demo dataset
@@ -122,14 +123,76 @@ compiler.
 ### Public one-pager
 - Server Component root reads all collections **in parallel** via the repository layer.
 - Sections are pure server components; only isolated interactive islands are client components (nav scroll-spy, theme toggle, project filter, contact form, animated counters).
-- `export const revalidate = 300` → ISR. Admin publishes trigger `revalidatePath('/')` + `revalidateTag('portfolio')` so changes appear without redeploy.
+- The page is rendered **per request** (`await connection()`), because it carries a per-request CSP nonce — a cached page would replay a stale nonce and the browser would block every script.
+- The database read is wrapped in a **tagged** Next.js data cache (`src/server/services/site-content-cache.ts`, tag `site-content`). Every admin mutation calls `updateTag('site-content')`, so a publish is visible on the very next public request — no redeploy, no stale window.
+- Admin publishes additionally trigger `revalidatePath('/')` and `revalidatePath('/admin')`.
 - Because it is one page, SEO is concentrated: `metadata` API, JSON-LD `Person` + `CreativeWork` per project, `sitemap.ts`, `robots.ts`, OG image generated at build via `opengraph-image.tsx`.
 
 ### Admin
-- Route group `(admin)` → `/admin` shell with a **tab switcher** (Overview, Projects, Experience, Skills, Writing, Messages, Media, Settings).
-- The page is a server component: it verifies ownership, loads every collection in parallel and hands plain data to the client shell.
-- Each tab is a client component; create/edit happens in a **slide-over** editor with no page navigation.
-- Mutations are Server Actions (`src/server/actions/admin.ts`). Each action re-validates the payload with Zod, calls `requireOwner()`, writes through the repository, records an audit entry and revalidates `/` and `/admin`; the client then calls `router.refresh()`.
+
+The admin is **multi-page**; only the public portfolio is a single page.
+
+```
+src/app/(admin)/admin/
+├── layout.tsx            # minimal wrapper
+├── login/page.tsx        # /admin/login — no chrome, no ownership check
+├── access-denied.tsx     # shared "not the owner" screen
+└── (workspace)/
+    ├── layout.tsx        # ownership gate + sidebar chrome
+    ├── page.tsx          # /admin            → Overview
+    ├── projects/         # /admin/projects
+    ├── experience/       # /admin/experience
+    ├── skills/           # /admin/skills
+    ├── writing/          # /admin/writing
+    ├── messages/         # /admin/messages
+    ├── media/            # /admin/media
+    └── settings/         # /admin/settings; general, appearance, security and ownership routes
+```
+
+The route group `(workspace)` keeps the sign-in page outside the workspace
+layout, so the login screen never renders behind the sidebar.
+
+- Every page is a server component: the workspace layout verifies ownership,
+  and each page loads only the collection it renders.
+- The sidebar navigates with real `<Link>` elements, so every section is
+  bookmarkable, linkable and reloadable.
+- Each content route is a client panel; create/edit happens in a **slide-over** editor with no page navigation.
+- Settings are separate pages (general, appearance/theme, appearance/hero, security and ownership). The shared workspace guard presents a bottom save/discard snackbar, blocks internal route links while settings are dirty, shakes the page on a blocked attempt, and uses the browser's beforeunload warning for refresh/close.
+- Mutations are Server Actions (`src/server/actions/admin.ts`). Each action re-validates the payload with Zod, calls `requireOwner()`, writes through the repository, records an audit entry, updates the `site-content` cache tag and revalidates `/` and `/admin`; the client then calls `router.refresh()`.
+- The admin navigation is a real list of links with `aria-current="page"` on
+  the active entry.
+- Every form control is wrapped in `Field`, which generates an id and links the `<label>` to the control — the labels are programmatically associated, not just visual.
+
+### Appearance
+
+The owner controls the look from **Admin → Settings → Appearance**:
+
+| Setting | Stored in | Effect |
+|---|---|---|
+| Default theme | `settings.theme.default` | The theme a first-time visitor sees; the sun/moon button always works. |
+| Accent colour | `settings.theme.accent` | The accent used everywhere. |
+| Font | `settings.theme.fontFamily` | Manrope, DM Sans, Space Grotesk or Inter. |
+| Reading size | `settings.theme.fontScale` | Compact, comfortable or spacious. |
+| Floating-card shape | `settings.theme.bubbleStyle` | Rounded, pill or soft square. |
+
+The accent is stored as a hex value and applied as the CSS variable
+`--accent-base` in the root layout. `globals.css` derives the two shades
+the design system actually uses from it:
+
+```css
+:root      { --accent: color-mix(in oklab, var(--accent-base) 92%, #000); }  /* light */
+.dark      { --accent: color-mix(in oklab, var(--accent-base) 88%, #fff); }  /* dark */
+```
+
+One colour therefore works in **both** themes — the light theme darkens it
+for contrast on white, the dark theme lightens it for contrast on black.
+
+Three presets ship in `src/lib/theme.ts` (Violet, Maroon, Emerald); the
+owner can also type any hex value. The picker applies the colour and typography preview to the live document
+while the owner is editing, so changes are visible before they are saved.
+The Appearance → Hero page controls the two floating image cards, their
+labels/content and whether either is shown; all settings subsections save
+independently.
 
 ---
 
@@ -206,7 +269,7 @@ Consequences:
 3. `users.role === 'owner'` for that user document.
 
 Enforcement points:
-- `src/proxy.ts` (the Next 16 network boundary) — a coarse routing gate for `/admin/**`: unauthenticated visitors are redirected to `/admin/login`; authenticated ones pass through.
+- `src/proxy.ts` (the Next 16 network boundary) — two jobs: it generates the per-request CSP nonce that Next.js stamps onto every script, and it acts as a coarse routing gate for `/admin/**` (unauthenticated visitors are redirected to `/admin/login`). It never gates a public route.
 - `requireOwner()` in the admin page and in **every** server action and admin route handler — it re-reads `settings.ownerEmail` and the user document on each call, so a stale cookie, a deleted account or an ownership transfer takes effect immediately.
 - The client-side `AdminShell` hides admin UI, but this is cosmetic only — never a security boundary.
 
@@ -219,7 +282,7 @@ The pure decision function (`evaluateOwnership`) is unit tested in
 - Login rate limit: 5 attempts / 15 min / IP+email (in-memory token bucket, Redis-ready interface).
 - Optional TOTP 2FA (`otpauth`) — enable flag in settings.
 - CSRF: mutating endpoints require the `Origin` header to match `NEXT_PUBLIC_SITE_URL`; `SameSite=Lax` cookies back this up.
-- Security headers: strict `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, HSTS.
+- Security headers: a nonce-based `Content-Security-Policy` built per request in `src/proxy.ts` (see `src/server/security/csp.ts`), plus `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, HSTS. The nonce is mandatory: without it the browser blocks every bundle and the page never hydrates.
 - Audit log: every admin mutation writes `{ actor, action, entity, entityId, at, ip }` to `auditLogs`.
 
 ---

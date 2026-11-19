@@ -1,11 +1,11 @@
 "use client";
 
-import { Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Pencil, Plus, Trash2 } from "@/components/ui/icons";
 import * as React from "react";
 
 import { ImagePicker } from "@/client/admin/image-picker";
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { ProjectsData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -77,7 +77,7 @@ function toFormState(project?: Project): ProjectFormState {
   };
 }
 
-export function ProjectsPanel({ data }: { data: AdminData }) {
+export function ProjectsPanel({ data }: { data: ProjectsData }) {
   const { pending, run } = useServerAction();
   const [open, setOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Project | undefined>();
@@ -89,10 +89,7 @@ export function ProjectsPanel({ data }: { data: AdminData }) {
     setOpen(true);
   }
 
-  function update<K extends keyof ProjectFormState>(
-    key: K,
-    value: ProjectFormState[K],
-  ) {
+  function update<K extends keyof ProjectFormState>(key: K, value: ProjectFormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
@@ -177,9 +174,7 @@ export function ProjectsPanel({ data }: { data: AdminData }) {
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-1 truncate text-sm text-muted">
-                    {project.summary}
-                  </p>
+                  <p className="mt-1 truncate text-sm text-muted">{project.summary}</p>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -367,9 +362,7 @@ export function ProjectsPanel({ data }: { data: AdminData }) {
               <Input
                 type="number"
                 value={form.order}
-                onChange={(event) =>
-                  update("order", Number(event.target.value) || 0)
-                }
+                onChange={(event) => update("order", Number(event.target.value) || 0)}
               />
             </Field>
             <div className="flex items-center justify-between rounded-xl border border-line px-4 py-3">
@@ -398,9 +391,7 @@ export function ProjectsPanel({ data }: { data: AdminData }) {
             <Field label="SEO description">
               <Input
                 value={form.seoDescription}
-                onChange={(event) =>
-                  update("seoDescription", event.target.value)
-                }
+                onChange={(event) => update("seoDescription", event.target.value)}
               />
             </Field>
           </div>

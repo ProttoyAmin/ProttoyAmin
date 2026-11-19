@@ -7,18 +7,22 @@ export const APP_NAME = "Prottoy Amin — Portfolio";
 export const SESSION_COOKIE = "pa_session";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
-export const ADMIN_TABS = [
-  { id: "overview", label: "Overview" },
-  { id: "projects", label: "Projects" },
-  { id: "experience", label: "Experience" },
-  { id: "skills", label: "Skills" },
-  { id: "writing", label: "Writing" },
-  { id: "messages", label: "Messages" },
-  { id: "media", label: "Media" },
-  { id: "settings", label: "Settings" },
+/**
+ * The admin is a set of separate pages, one per concern. Each entry maps
+ * to its own route so a page can be linked, bookmarked and reloaded.
+ */
+export const ADMIN_NAV = [
+  { id: "overview", label: "Overview", href: "/admin" },
+  { id: "projects", label: "Projects", href: "/admin/projects" },
+  { id: "experience", label: "Experience", href: "/admin/experience" },
+  { id: "skills", label: "Skills", href: "/admin/skills" },
+  { id: "writing", label: "Writing", href: "/admin/writing" },
+  { id: "messages", label: "Messages", href: "/admin/messages" },
+  { id: "media", label: "Media", href: "/admin/media" },
+  { id: "settings", label: "Settings", href: "/admin/settings" },
 ] as const;
 
-export type AdminTabId = (typeof ADMIN_TABS)[number]["id"];
+export type AdminNavId = (typeof ADMIN_NAV)[number]["id"];
 
 export const SITE_SECTIONS = [
   { id: "home", label: "Home" },

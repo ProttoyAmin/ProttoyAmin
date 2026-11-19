@@ -1,10 +1,10 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "@/components/ui/icons";
 import * as React from "react";
 
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { SkillsData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -33,7 +33,7 @@ const EMPTY: SkillForm = {
   order: 0,
 };
 
-export function SkillsPanel({ data }: { data: AdminData }) {
+export function SkillsPanel({ data }: { data: SkillsData }) {
   const { pending, run } = useServerAction();
   const [open, setOpen] = React.useState(false);
   const [form, setForm] = React.useState<SkillForm>(EMPTY);
@@ -191,9 +191,7 @@ export function SkillsPanel({ data }: { data: AdminData }) {
               min={1}
               max={5}
               value={form.proficiency}
-              onChange={(event) =>
-                update("proficiency", Number(event.target.value) || 1)
-              }
+              onChange={(event) => update("proficiency", Number(event.target.value) || 1)}
             />
           </Field>
           <div className="flex items-center justify-between rounded-xl border border-line px-4 py-3">

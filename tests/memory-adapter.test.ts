@@ -87,11 +87,18 @@ describe("MemoryStore", () => {
       tags: [],
     });
 
+    // The timestamps have millisecond resolution, so the clock is advanced
+    // to make the assertion deterministic instead of timing dependent.
+    await new Promise((resolve) => setTimeout(resolve, 5));
+
     const updated = await collection.update(created.id, { title: "After" });
     expect(updated?.title).toBe("After");
     expect(updated?.id).toBe(created.id);
     expect(updated?.createdAt).toBe(created.createdAt);
     expect(updated?.updatedAt).not.toBe(created.updatedAt);
+    expect(
+      Date.parse(updated?.updatedAt ?? "") > Date.parse(created.updatedAt),
+    ).toBe(true);
   });
 
   it("removes documents", async () => {

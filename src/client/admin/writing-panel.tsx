@@ -1,11 +1,11 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "@/components/ui/icons";
 import * as React from "react";
 
 import { ImagePicker } from "@/client/admin/image-picker";
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { WritingData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -50,7 +50,7 @@ function toForm(post?: Post): PostForm {
   };
 }
 
-export function WritingPanel({ data }: { data: AdminData }) {
+export function WritingPanel({ data }: { data: WritingData }) {
   const { pending, run } = useServerAction();
   const [open, setOpen] = React.useState(false);
   const [form, setForm] = React.useState<PostForm>(EMPTY);
@@ -90,9 +90,7 @@ export function WritingPanel({ data }: { data: AdminData }) {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Writing</h1>
-          <p className="mt-1 text-sm text-muted">
-            Long-form notes kept for the future.
-          </p>
+          <p className="mt-1 text-sm text-muted">Long-form notes kept for the future.</p>
         </div>
         <Button onClick={() => openEditor()}>
           <Plus className="h-4 w-4" /> New post
@@ -123,9 +121,7 @@ export function WritingPanel({ data }: { data: AdminData }) {
                       {post.published ? "Published" : "Draft"}
                     </span>
                   </div>
-                  <p className="mt-1 truncate text-sm text-muted">
-                    {post.excerpt}
-                  </p>
+                  <p className="mt-1 truncate text-sm text-muted">{post.excerpt}</p>
                   <p className="mt-1 text-xs text-muted">
                     {post.readingTimeMinutes} min read
                     {post.publishedAt ? ` · ${formatDate(post.publishedAt)}` : ""}

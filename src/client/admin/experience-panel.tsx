@@ -1,21 +1,18 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "@/components/ui/icons";
 import * as React from "react";
 
 import { ImagePicker } from "@/client/admin/image-picker";
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { ExperienceData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { Sheet } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import {
-  deleteExperienceAction,
-  saveExperienceAction,
-} from "@/server/actions/admin";
+import { deleteExperienceAction, saveExperienceAction } from "@/server/actions/admin";
 import { formatDateRange } from "@/lib/format";
 import type { Experience, ImageAsset } from "@/server/types";
 
@@ -65,7 +62,7 @@ function toForm(experience?: Experience): ExperienceForm {
   };
 }
 
-export function ExperiencePanel({ data }: { data: AdminData }) {
+export function ExperiencePanel({ data }: { data: ExperienceData }) {
   const { pending, run } = useServerAction();
   const [open, setOpen] = React.useState(false);
   const [form, setForm] = React.useState<ExperienceForm>(EMPTY);
@@ -75,10 +72,7 @@ export function ExperiencePanel({ data }: { data: AdminData }) {
     setOpen(true);
   }
 
-  function update<K extends keyof ExperienceForm>(
-    key: K,
-    value: ExperienceForm[K],
-  ) {
+  function update<K extends keyof ExperienceForm>(key: K, value: ExperienceForm[K]) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
@@ -205,9 +199,7 @@ export function ExperiencePanel({ data }: { data: AdminData }) {
             <Field label="Employment type">
               <Input
                 value={form.employmentType}
-                onChange={(event) =>
-                  update("employmentType", event.target.value)
-                }
+                onChange={(event) => update("employmentType", event.target.value)}
                 placeholder="Full-time"
               />
             </Field>
@@ -261,9 +253,7 @@ export function ExperiencePanel({ data }: { data: AdminData }) {
               <Input
                 type="number"
                 value={form.order}
-                onChange={(event) =>
-                  update("order", Number(event.target.value) || 0)
-                }
+                onChange={(event) => update("order", Number(event.target.value) || 0)}
               />
             </Field>
             <div className="flex items-center justify-between rounded-xl border border-line px-4 py-3">

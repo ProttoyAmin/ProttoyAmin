@@ -117,15 +117,21 @@ The limiter is an in-process implementation behind a `RateLimiter` interface, so
 
 ## 7. HTTP hardening
 
-Applied in `next.config.ts` / middleware:
+The static headers live in `next.config.ts`. The CSP is **per request** and is
+built in `src/proxy.ts` (via `src/server/security/csp.ts`), because it carries
+a nonce:
 
 ```text
 Content-Security-Policy: default-src 'self';
-  script-src 'self' 'nonce-<generated>';
+  script-src 'self' 'nonce-<per-request>' 'strict-dynamic';
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com data:;
   img-src 'self' data: blob: https://res.cloudinary.com;
+  media-src 'self' https://res.cloudinary.com;
   connect-src 'self' https://*.mongodb.net https://api.cloudinary.com;
-  frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+  frame-src 'none'; frame-ancestors 'none';
+  base-uri 'self'; form-action 'self'; object-src 'none';
+  upgrade-insecure-requests
 X-Frame-Options: DENY
 X-Content-Type-Options: nosniff
 Referrer-Policy: strict-origin-when-cross-origin
@@ -133,8 +139,27 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()
 Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 ```
 
-- CSP uses **nonces** for Next.js inline scripts; `'unsafe-eval'` is enabled only in development.
-- `SameSite=Lax` cookies + an `Origin`/`Referer` check on every mutating request provide CSRF defence.
+### How the nonce works — and why it is not optional
+
+1. `src/proxy.ts` generates a fresh random nonce for every document request.
+2. The nonce is written into **both** the request CSP header and the response
+   CSP header, and is passed to the renderer through the `x-nonce` request
+   header.
+3. Next.js reads the nonce from the request CSP and stamps it onto every
+   script tag it emits — including the inline theme script in
+   `src/app/layout.tsx`, which reads `x-nonce` from `headers()`.
+4. The response header and the script tags therefore carry the same value.
+
+> **The failure mode to avoid.** `'strict-dynamic'` without a matching nonce
+> means *no* script may run. The HTML still renders, so `curl` and HTTP
+> status checks look healthy, but the page never hydrates: navigation is
+> dead and the admin panel stays blank. Always verify a change to the CSP in
+> a real browser, not with `curl` alone.
+
+- `'unsafe-eval'` is enabled only in development (React needs it for stack
+  traces).
+- `SameSite=Lax` cookies + an `Origin`/`Referer` check on every mutating
+  request provide CSRF defence.
 
 ---
 

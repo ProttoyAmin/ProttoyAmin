@@ -1,18 +1,22 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Loader2, Lock, ShieldCheck } from "lucide-react";
+import { Loader2, Lock, ShieldCheck } from "@/components/ui/icons";
 import * as React from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 
-export function LoginForm() {
+export function LoginForm({
+  next = "/admin",
+  disabled = false,
+}: {
+  next?: string;
+  disabled?: boolean;
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/admin";
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -66,9 +70,7 @@ export function LoginForm() {
           <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-accent text-white shadow-[0_12px_40px_-12px_var(--accent)]">
             <ShieldCheck className="h-5 w-5" />
           </div>
-          <h1 className="mt-5 text-2xl font-semibold tracking-tight">
-            Portfolio admin
-          </h1>
+          <h1 className="mt-5 text-2xl font-semibold tracking-tight">Portfolio admin</h1>
           <p className="mt-2 text-sm text-muted">
             Only the account listed as the portfolio owner can sign in.
           </p>
@@ -87,6 +89,7 @@ export function LoginForm() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
+              disabled={disabled}
             />
           </Field>
 
@@ -99,6 +102,7 @@ export function LoginForm() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
+              disabled={disabled}
             />
           </Field>
 
@@ -108,7 +112,7 @@ export function LoginForm() {
             </p>
           ) : null}
 
-          <Button type="submit" className="mt-6 w-full" disabled={pending}>
+          <Button type="submit" className="mt-6 w-full" disabled={pending || disabled}>
             {pending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" /> Signing in…

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { CheckCircle2, Loader2, Send } from "lucide-react";
+import { CheckCircle2, Loader2, Send } from "@/components/ui/icons";
 import * as React from "react";
 
 import { Reveal } from "@/components/motion/reveal";
@@ -96,9 +96,7 @@ export function Contact({
             <p className="mt-1.5 text-sm font-medium">{location}</p>
           </div>
           <div className="rounded-2xl border border-line bg-surface/50 p-5">
-            <p className="text-xs uppercase tracking-wider text-muted">
-              Availability
-            </p>
+            <p className="text-xs uppercase tracking-wider text-muted">Availability</p>
             <p className="mt-1.5 flex items-center gap-2 text-sm font-medium">
               <span className="h-2 w-2 rounded-full bg-success" />
               {availability}
@@ -117,12 +115,7 @@ export function Contact({
                 <Input name="name" placeholder="Ada Lovelace" required />
               </Field>
               <Field label="Email">
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="ada@example.com"
-                  required
-                />
+                <Input name="email" type="email" placeholder="ada@example.com" required />
               </Field>
             </div>
 

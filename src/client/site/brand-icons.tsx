@@ -3,10 +3,8 @@
 import type { SVGProps } from "react";
 
 /**
- * Brand marks as inline SVG.
- *
- * Lucide v1 dropped brand icons, so the few this portfolio needs are drawn
- * here — no extra dependency, no icon-font request.
+ * Brand logos keep their official vector paths; interface icons use Hugeicons.
+ * This small set is inline SVG and adds no icon-font request.
  */
 
 type IconProps = SVGProps<SVGSVGElement>;

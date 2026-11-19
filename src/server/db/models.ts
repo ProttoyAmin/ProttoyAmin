@@ -64,6 +64,16 @@ const settingsSchema = new Schema(
       secondaryCtaHref: { type: String, default: "" },
       portraitUrl: { type: String, default: "" },
       portraitAlt: { type: String, default: "" },
+      primaryBadge: {
+        enabled: { type: Boolean, default: true },
+        label: { type: String, default: "Currently" },
+        value: { type: String, default: "Building products" },
+      },
+      secondaryBadge: {
+        enabled: { type: Boolean, default: true },
+        label: { type: String, default: "Stack" },
+        value: { type: String, default: "React · Go · MongoDB" },
+      },
     },
     socials: {
       type: [
@@ -81,7 +91,22 @@ const settingsSchema = new Schema(
     },
     theme: {
       default: { type: String, enum: ["dark", "light"], default: "dark" },
-      accent: { type: String, default: "#7c5cff" },
+      accent: { type: String, default: "#6d4aff" },
+      fontFamily: {
+        type: String,
+        enum: ["inter", "manrope", "dm-sans", "space-grotesk"],
+        default: "manrope",
+      },
+      fontScale: {
+        type: String,
+        enum: ["compact", "comfortable", "spacious"],
+        default: "comfortable",
+      },
+      bubbleStyle: {
+        type: String,
+        enum: ["rounded", "pill", "soft-square"],
+        default: "pill",
+      },
     },
     features: {
       contactEnabled: { type: Boolean, default: true },
@@ -279,8 +304,7 @@ export const models = {
   posts: mongoose.models.Post ?? mongoose.model("Post", postSchema),
   messages: mongoose.models.Message ?? mongoose.model("Message", messageSchema),
   media: mongoose.models.Media ?? mongoose.model("Media", mediaSchema),
-  auditLogs:
-    mongoose.models.AuditLog ?? mongoose.model("AuditLog", auditLogSchema),
+  auditLogs: mongoose.models.AuditLog ?? mongoose.model("AuditLog", auditLogSchema),
 };
 
 export type ModelName = keyof typeof models;

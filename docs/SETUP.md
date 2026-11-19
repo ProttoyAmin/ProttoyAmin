@@ -10,9 +10,13 @@ variables.
 ## 1. Boot it (30 seconds)
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
+
+> The project is pinned to **pnpm 10** (`packageManager` in `package.json`).
+> `corepack enable` gives you the right version automatically. `npm install`
+> also works, but the lockfile of record is `pnpm-lock.yaml`.
 
 Open <http://localhost:3000> for the portfolio and
 <http://localhost:3000/admin> for the admin panel.
@@ -25,8 +29,8 @@ Open <http://localhost:3000> for the portfolio and
 | Password | `portfolio-admin` (or `ADMIN_PASSWORD`) |
 
 > The password is hashed with bcrypt on first boot and never stored in plain
-> text. Change it from **Admin → Settings → Change password**, or run
-> `npm run admin:reset -- "your-new-password"`.
+> text. Change it from **Admin → Settings → Password & security**, or run
+> `pnpm run admin:reset -- "your-new-password"`.
 
 Without any credentials the site still works end to end:
 
@@ -36,6 +40,92 @@ Without any credentials the site still works end to end:
 | Media | Local disk at `.data/uploads/`, served through `/api/media/[...path]` |
 | Email | Messages are stored in the admin inbox, no delivery |
 | Sessions | A development-only signing secret is used (a warning is logged) |
+
+### Production needs `SESSION_SECRET`
+
+`pnpm run dev` falls back to a built-in development signing secret.
+**`pnpm run start` (production) does not** — it refuses to sign a session and
+shows a visible banner instead:
+
+> Admin sign-in is disabled because `SESSION_SECRET` is not configured.
+
+Set it before the first production boot:
+
+```bash
+export SESSION_SECRET="$(openssl rand -base64 48)"
+export ADMIN_PASSWORD="a-strong-password"
+pnpm run build && pnpm run start
+```
+
+`ADMIN_PASSWORD` bootstraps the owner account on first sign-in. Without it
+production has no owner to sign in as, and the admin panel stays locked.
+
+### Boot commands
+
+| Command | What it does |
+|---|---|
+| `pnpm run dev` | Development server on <http://localhost:3000> |
+| `pnpm run build` | Production build |
+| `pnpm run start` | Production server (requires `SESSION_SECRET`) |
+| `pnpm run seed:dummy` | Writes the demo content into the configured database |
+| `pnpm run admin:reset -- "<password>"` | Sets a new owner password |
+| `pnpm run atlas:provision` | Creates the Atlas cluster, database and indexes |
+
+### The admin pages
+
+The admin is a set of **separate pages** — only the public portfolio is a
+single page. Each one is a real route, so it can be bookmarked and reloaded.
+
+| Route | What it does |
+|---|---|
+| `/admin` | Overview: content health, stats, recent activity |
+| `/admin/projects` | CRUD for projects, cover image, links, publish/draft |
+| `/admin/experience` | CRUD for the work timeline |
+| `/admin/skills` | CRUD for skills, grouped by category |
+| `/admin/writing` | CRUD for blog posts |
+| `/admin/messages` | The contact-form inbox |
+| `/admin/media` | The asset library and uploads |
+| `/admin/settings` | General site identity, social links, feature switches and SEO |
+| `/admin/settings/appearance/theme` | Accent, light/dark default, typography, reading scale and floating-card shape |
+| `/admin/settings/appearance/hero` | Hero copy, profile picture and the two floating-card labels/content |
+| `/admin/settings/security` | Password changes |
+| `/admin/settings/ownership` | Owner transfer |
+
+### Appearance and hero settings
+
+The appearance pages save independently, so changing a hero image does not
+require saving unrelated site settings:
+
+- **Settings → Appearance → Theme** (`/admin/settings/appearance/theme`):
+  choose Violet, Maroon, Emerald or a custom hex accent; set the default
+  light/dark mode; preview Manrope, DM Sans, Space Grotesk or Inter; adjust
+  reading scale; and choose the floating hero-card shape (rounded, pill or
+  soft square).
+- **Settings → Appearance → Hero** (`/admin/settings/appearance/hero`):
+  edit the hero text and calls to action, upload/pick the portrait, and
+  configure or hide each floating information card.
+- **Settings → General** (`/admin/settings`): site identity, social links,
+  feature switches and SEO metadata.
+- **Settings → Password & security** and **Ownership** keep account actions
+  in their own pages.
+
+Unsaved edits show a persistent bottom snackbar. Save or discard before
+leaving; attempted route changes are blocked and the page gives a short
+shake as feedback. Browser refresh/close also gets the standard unsaved-work
+warning.
+
+The chosen accent is stored in `settings.theme.accent` and applied as a CSS
+variable, so both light and dark palettes derive from it. Typography and
+shape choices are persisted under `settings.theme`; the two hero cards are
+saved under `settings.hero.primaryBadge` and `settings.hero.secondaryBadge`.
+
+---
+
+### Change the profile picture
+
+**Settings → Appearance → Hero → Portrait**: upload a new image or choose one
+from the media library, then save that page. The picture appears in the
+public hero.
 
 ---
 
@@ -66,7 +156,7 @@ MONGODB_DB_NAME=portfolio
 MONGODB_ATLAS_API_KEY="<publicKey>:<privateKey>" \
 MONGODB_ATLAS_ORG_ID="<orgId>" \
 MONGODB_ATLAS_PROJECT_ID="<projectId>" \
-npm run atlas:provision
+pnpm run atlas:provision
 ```
 
 The script:
@@ -132,7 +222,7 @@ Without these, contact-form messages still land in **Admin → Messages**.
 | `SESSION_SECRET` | production | JWT signing key (≥ 32 chars). `openssl rand -base64 48` |
 | `MONGODB_URI` | production | Atlas SRV connection string |
 | `MONGODB_DB_NAME` | production | Database name (default `portfolio`) |
-| `MONGODB_ATLAS_API_KEY` | optional | Atlas Admin API key — used only by `npm run atlas:provision` |
+| `MONGODB_ATLAS_API_KEY` | optional | Atlas Admin API key — used only by `pnpm run atlas:provision` |
 | `MONGODB_ATLAS_ORG_ID` | optional | Atlas organisation id (provisioning) |
 | `MONGODB_ATLAS_PROJECT_ID` | optional | Atlas project id (provisioning) |
 | `DB_DRIVER` | optional | `mongo` \| `memory` — auto-detected when unset |
@@ -153,14 +243,14 @@ Without these, contact-form messages still land in **Admin → Messages**.
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Development server on :3000 |
-| `npm run build` / `npm start` | Production build and server |
-| `npm run lint` | ESLint (Next core-web-vitals + typescript rules) |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest unit + integration suite |
-| `npm run seed:dummy` | Writes the demo content into the configured database |
-| `npm run admin:reset -- "<password>"` | Resets the owner password |
-| `npm run atlas:provision` | Creates the Atlas user + access list, prints the SRV URI |
+| `pnpm run dev` | Development server on :3000 |
+| `pnpm run build` / `pnpm start` | Production build and server |
+| `pnpm run lint` | ESLint (Next core-web-vitals + typescript rules) |
+| `pnpm run typecheck` | `tsc --noEmit` |
+| `pnpm test` | Vitest unit + integration suite |
+| `pnpm run seed:dummy` | Writes the demo content into the configured database |
+| `pnpm run admin:reset -- "<password>"` | Resets the owner password |
+| `pnpm run atlas:provision` | Creates the Atlas user + access list, prints the SRV URI |
 
 ---
 
@@ -189,8 +279,8 @@ Without these, contact-form messages still land in **Admin → Messages**.
 | Symptom | Cause | Fix |
 |---|---|---|
 | “Running in demo mode” banner | `MONGODB_URI` missing | Add the variable and restart |
-| “The database is unreachable” banner | Bad URI, IP not allow-listed, cluster paused | Run `npm run atlas:provision` or allow-list `0.0.0.0/0` |
+| “The database is unreachable” banner | Bad URI, IP not allow-listed, cluster paused | Run `pnpm run atlas:provision` or allow-list `0.0.0.0/0` |
 | Admin says “Access restricted” | The signed-in email is not `settings.ownerEmail` | Sign in with the owner account, or transfer ownership from Settings |
 | Uploads fail | Cloudinary credentials incomplete | Check all three `CLOUDINARY_*` variables |
 | Content edits do not appear | Browser cache | The page revalidates every 5 minutes; a publish revalidates immediately |
-| Port 3000 already in use | Another dev server | `PORT=3001 npm run dev` |
+| Port 3000 already in use | Another dev server | `PORT=3001 pnpm run dev` |
