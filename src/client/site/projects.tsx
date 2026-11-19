@@ -4,7 +4,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight, Link2 } from "lucide-react";
+import { ArrowUpRight, Link2 } from "@/components/ui/icons";
 
 import { GitHubIcon } from "@/client/site/brand-icons";
 import * as React from "react";

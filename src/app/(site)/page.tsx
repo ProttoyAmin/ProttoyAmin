@@ -6,14 +6,12 @@ import { Contact } from "@/client/site/contact";
 import { ExperienceTimeline } from "@/client/site/experience";
 import { SiteFooter } from "@/client/site/footer";
 import { Hero } from "@/client/site/hero";
-import { SiteNav } from "@/client/site/nav";
+import { SectionNav } from "@/client/site/section-nav";
 import { Projects } from "@/client/site/projects";
 import { Skills } from "@/client/site/skills";
 import { getRuntimeStatus } from "@/server/db/registry";
 import { groupSkillsByCategory } from "@/server/services/content.service";
 import { getCachedSiteContent } from "@/server/services/site-content-cache";
-
-
 
 export async function generateMetadata(): Promise<Metadata> {
   const { settings } = await getCachedSiteContent();
@@ -105,7 +103,6 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <SiteNav />
       <main>
         <Hero
           greeting={settings.hero.greeting}
@@ -119,7 +116,23 @@ export default async function HomePage() {
           portraitAlt={settings.hero.portraitAlt}
           socials={settings.socials}
           stats={stats}
+          primaryBadge={
+            settings.hero.primaryBadge ?? {
+              enabled: true,
+              label: "Currently",
+              value: "Building products",
+            }
+          }
+          secondaryBadge={
+            settings.hero.secondaryBadge ?? {
+              enabled: true,
+              label: "Stack",
+              value: "React · Go · MongoDB",
+            }
+          }
+          bubbleStyle={settings.theme.bubbleStyle ?? "pill"}
         />
+        <SectionNav />
 
         <About description={settings.description} facts={facts} counters={counters} />
 
@@ -131,10 +144,9 @@ export default async function HomePage() {
 
         <Contact
           email={
-            settings.socials.find((social) => social.platform === "email")?.url.replace(
-              "mailto:",
-              "",
-            ) ?? ""
+            settings.socials
+              .find((social) => social.platform === "email")
+              ?.url.replace("mailto:", "") ?? ""
           }
           location={settings.seo.location || "Dhaka, Bangladesh"}
           availability="Open to interesting work"

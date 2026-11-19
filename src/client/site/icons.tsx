@@ -1,15 +1,10 @@
 "use client";
 
-import { Globe, Mail, Music2, type LucideIcon } from "lucide-react";
+import { Globe, Mail, Music2, type IconComponent } from "@/components/ui/icons";
 
-import {
-  GitHubIcon,
-  LinkedInIcon,
-  XIcon,
-  YouTubeIcon,
-} from "@/client/site/brand-icons";
+import { GitHubIcon, LinkedInIcon, XIcon, YouTubeIcon } from "@/client/site/brand-icons";
 
-const ICONS: Record<string, LucideIcon> = {
+const ICONS: Record<string, IconComponent> = {
   mail: Mail,
   email: Mail,
   music: Music2,
@@ -17,15 +12,15 @@ const ICONS: Record<string, LucideIcon> = {
   globe: Globe,
 };
 
-const BRAND_ICONS: Record<string, LucideIcon> = {
-  github: GitHubIcon as unknown as LucideIcon,
-  linkedin: LinkedInIcon as unknown as LucideIcon,
-  x: XIcon as unknown as LucideIcon,
-  twitter: XIcon as unknown as LucideIcon,
-  youtube: YouTubeIcon as unknown as LucideIcon,
+const BRAND_ICONS: Record<string, IconComponent> = {
+  github: GitHubIcon as unknown as IconComponent,
+  linkedin: LinkedInIcon as unknown as IconComponent,
+  x: XIcon as unknown as IconComponent,
+  twitter: XIcon as unknown as IconComponent,
+  youtube: YouTubeIcon as unknown as IconComponent,
 };
 
-export function socialIcon(platform: string): LucideIcon {
+export function socialIcon(platform: string): IconComponent {
   const key = platform.toLowerCase();
   return BRAND_ICONS[key] ?? ICONS[key] ?? Globe;
 }

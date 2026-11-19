@@ -39,7 +39,7 @@ piece of content.
 | **Stack** | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Motion (Framer Motion) |
 | **Database** | MongoDB Atlas + Mongoose 9, behind a repository layer with a local file driver for development |
 | **Media** | Cloudinary (free tier) with a local-disk fallback |
-| **Admin** | Tabbed panel at `/admin` — projects, experience, skills, writing, messages, media, settings |
+| **Admin** | Separate routes for overview, projects, experience, skills, writing, messages, media and settings |
 | **Access** | Only the account in `settings.ownerEmail` can sign in — enforced on the server, on every request |
 
 ### Quick start

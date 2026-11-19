@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Menu, Moon, Sun, X } from "lucide-react";
+import { Menu, Moon, Sun, X } from "@/components/ui/icons";
 import Link from "next/link";
 import * as React from "react";
 
@@ -56,10 +56,7 @@ export function SiteNav({ adminHref = "/admin" }: { adminHref?: string }) {
    * The nav items are real anchors so the page still navigates before (or
    * without) hydration; JavaScript only upgrades them to a smooth scroll.
    */
-  const handleAnchor = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    id: string,
-  ) => {
+  const handleAnchor = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     const element = document.getElementById(id);
     if (!element) return; // let the browser handle the hash natively
     event.preventDefault();

@@ -1,4 +1,4 @@
-import { Loader2, TriangleAlert } from "lucide-react";
+import { Loader2, TriangleAlert } from "@/components/ui/icons";
 import { Suspense } from "react";
 
 import { LoginForm } from "@/client/admin/login-form";
@@ -28,8 +28,7 @@ export default async function AdminLoginPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const params = await searchParams;
-  const next =
-    params.next && params.next.startsWith("/") ? params.next : "/admin";
+  const next = params.next && params.next.startsWith("/") ? params.next : "/admin";
 
   // Missing configuration must be visible before the visitor types a
   // password — otherwise the failure looks like a broken login.
@@ -42,8 +41,8 @@ export default async function AdminLoginPage({
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
           <p>
             Admin sign-in is disabled because{" "}
-            <code className="font-medium">SESSION_SECRET</code> is not
-            configured. Set it in the environment and restart the server.
+            <code className="font-medium">SESSION_SECRET</code> is not configured. Set it
+            in the environment and restart the server.
           </p>
         </div>
       )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "@/components/ui/icons";
 import * as React from "react";
 
 import { useServerAction } from "@/client/admin/use-server-action";
@@ -191,9 +191,7 @@ export function SkillsPanel({ data }: { data: SkillsData }) {
               min={1}
               max={5}
               value={form.proficiency}
-              onChange={(event) =>
-                update("proficiency", Number(event.target.value) || 1)
-              }
+              onChange={(event) => update("proficiency", Number(event.target.value) || 1)}
             />
           </Field>
           <div className="flex items-center justify-between rounded-xl border border-line px-4 py-3">

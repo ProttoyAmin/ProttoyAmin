@@ -40,6 +40,8 @@ export const DUMMY_SETTINGS: SiteSettings = {
     secondaryCtaHref: "#contact",
     portraitUrl: "/demo/portrait.svg",
     portraitAlt: "Portrait of Prottoy Amin",
+    primaryBadge: { enabled: true, label: "Currently", value: "Building products" },
+    secondaryBadge: { enabled: true, label: "Stack", value: "React · Go · MongoDB" },
   },
   socials: [
     {
@@ -70,6 +72,9 @@ export const DUMMY_SETTINGS: SiteSettings = {
   theme: {
     default: "dark",
     accent: "#6d4aff",
+    fontFamily: "manrope",
+    fontScale: "comfortable",
+    bubbleStyle: "pill",
   },
   features: {
     contactEnabled: true,

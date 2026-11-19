@@ -38,11 +38,16 @@ export interface SiteSettings {
     secondaryCtaHref: string;
     portraitUrl: string;
     portraitAlt: string;
+    primaryBadge?: { enabled: boolean; label: string; value: string };
+    secondaryBadge?: { enabled: boolean; label: string; value: string };
   };
   socials: SocialLink[];
   theme: {
     default: "dark" | "light";
     accent: string;
+    fontFamily?: "inter" | "manrope" | "dm-sans" | "space-grotesk";
+    fontScale?: "compact" | "comfortable" | "spacious";
+    bubbleStyle?: "rounded" | "pill" | "soft-square";
   };
   features: {
     contactEnabled: boolean;

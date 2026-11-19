@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "@/components/ui/icons";
 
 import { Button } from "@/components/ui/button";
 
@@ -10,13 +10,10 @@ export function AccessDenied({ message }: { message: string }) {
       <div className="grid h-14 w-14 place-items-center rounded-2xl bg-danger/15 text-danger">
         <ShieldAlert className="h-6 w-6" />
       </div>
-      <h1 className="mt-6 text-2xl font-semibold tracking-tight">
-        Access restricted
-      </h1>
+      <h1 className="mt-6 text-2xl font-semibold tracking-tight">Access restricted</h1>
       <p className="mt-3 text-sm text-muted">{message}</p>
       <p className="mt-2 text-sm text-muted">
-        Only the account listed in <code>settings.ownerEmail</code> can manage
-        this site.
+        Only the account listed in <code>settings.ownerEmail</code> can manage this site.
       </p>
       <div className="mt-8 flex gap-3">
         <Link href="/admin/login">

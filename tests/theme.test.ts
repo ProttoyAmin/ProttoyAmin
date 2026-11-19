@@ -7,7 +7,7 @@ import {
   normalizeAccent,
   presetForAccent,
 } from "@/lib/theme";
-import { socialLinkSchema } from "@/lib/validation/content";
+import { settingsInputSchema, socialLinkSchema } from "@/lib/validation/content";
 
 describe("accent colours", () => {
   it("offers exactly three presets", () => {
@@ -44,6 +44,47 @@ describe("accent colours", () => {
   it("matches a preset by colour", () => {
     expect(presetForAccent("#9b1c31")?.id).toBe("maroon");
     expect(presetForAccent("#123456")).toBeUndefined();
+  });
+});
+
+describe("appearance settings", () => {
+  const input = {
+    siteTitle: "A portfolio",
+    hero: {},
+    socials: [],
+    theme: {
+      default: "dark",
+      accent: "#123456",
+      fontFamily: "space-grotesk",
+      fontScale: "spacious",
+      bubbleStyle: "rounded",
+    },
+    features: {},
+    seo: {},
+  };
+
+  it("accepts supported typography and floating-card choices", () => {
+    const parsed = settingsInputSchema.parse(input);
+    expect(parsed.theme.fontFamily).toBe("space-grotesk");
+    expect(parsed.theme.fontScale).toBe("spacious");
+    expect(parsed.theme.bubbleStyle).toBe("rounded");
+    expect(parsed.hero.primaryBadge.label).toBe("Currently");
+    expect(parsed.hero.secondaryBadge.enabled).toBe(true);
+  });
+
+  it("rejects unknown font and bubble styles", () => {
+    expect(
+      settingsInputSchema.safeParse({
+        ...input,
+        theme: { ...input.theme, fontFamily: "comic-sans" },
+      }).success,
+    ).toBe(false);
+    expect(
+      settingsInputSchema.safeParse({
+        ...input,
+        theme: { ...input.theme, bubbleStyle: "oval" },
+      }).success,
+    ).toBe(false);
   });
 });
 

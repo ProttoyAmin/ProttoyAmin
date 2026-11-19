@@ -55,9 +55,7 @@ export async function saveProjectAction(input: unknown): Promise<ActionResult> {
     const existing = data.id ? await repositories.projects.getById(data.id) : null;
 
     const slug =
-      data.slug?.trim() ||
-      slugify(data.title) ||
-      `project-${Date.now().toString(36)}`;
+      data.slug?.trim() || slugify(data.title) || `project-${Date.now().toString(36)}`;
 
     const payload = {
       title: data.title,
@@ -119,9 +117,7 @@ export async function deleteProjectAction(id: string): Promise<ActionResult> {
   }
 }
 
-export async function toggleProjectPublishedAction(
-  id: string,
-): Promise<ActionResult> {
+export async function toggleProjectPublishedAction(id: string): Promise<ActionResult> {
   try {
     const { user } = await requireOwner();
     const repositories = await getRepositories();
@@ -146,16 +142,12 @@ export async function toggleProjectPublishedAction(
 
 /* ── Experience ───────────────────────────────────────────────────────── */
 
-export async function saveExperienceAction(
-  input: unknown,
-): Promise<ActionResult> {
+export async function saveExperienceAction(input: unknown): Promise<ActionResult> {
   try {
     const { user } = await requireOwner();
     const data = experienceInputSchema.parse(input);
     const repositories = await getRepositories();
-    const existing = data.id
-      ? await repositories.experiences.getById(data.id)
-      : null;
+    const existing = data.id ? await repositories.experiences.getById(data.id) : null;
 
     const payload = {
       company: data.company,
@@ -280,7 +272,8 @@ export async function savePostAction(input: unknown): Promise<ActionResult> {
     const repositories = await getRepositories();
     const existing = data.id ? await repositories.posts.getById(data.id) : null;
 
-    const slug = data.slug?.trim() || slugify(data.title) || `post-${Date.now().toString(36)}`;
+    const slug =
+      data.slug?.trim() || slugify(data.title) || `post-${Date.now().toString(36)}`;
     const published = data.published === true || data.published === "true";
 
     const payload = {
@@ -386,7 +379,21 @@ export async function saveSettingsAction(input: unknown): Promise<ActionResult> 
       siteTitle: data.siteTitle,
       tagline: data.tagline,
       description: data.description,
-      hero: data.hero,
+      hero: {
+        ...data.hero,
+        primaryBadge: {
+          ...data.hero.primaryBadge,
+          enabled:
+            data.hero.primaryBadge.enabled !== false &&
+            data.hero.primaryBadge.enabled !== "false",
+        },
+        secondaryBadge: {
+          ...data.hero.secondaryBadge,
+          enabled:
+            data.hero.secondaryBadge.enabled !== false &&
+            data.hero.secondaryBadge.enabled !== "false",
+        },
+      },
       socials: data.socials,
       theme: data.theme,
       features: {
@@ -444,9 +451,7 @@ export async function changePasswordAction(input: unknown): Promise<ActionResult
   }
 }
 
-export async function transferOwnershipAction(
-  input: unknown,
-): Promise<ActionResult> {
+export async function transferOwnershipAction(input: unknown): Promise<ActionResult> {
   try {
     const { user } = await requireOwner();
     const data = transferOwnershipSchema.parse(input);

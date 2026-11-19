@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Pencil, Plus, Trash2 } from "@/components/ui/icons";
 import * as React from "react";
 
 import { ImagePicker } from "@/client/admin/image-picker";
@@ -89,10 +89,7 @@ export function ProjectsPanel({ data }: { data: ProjectsData }) {
     setOpen(true);
   }
 
-  function update<K extends keyof ProjectFormState>(
-    key: K,
-    value: ProjectFormState[K],
-  ) {
+  function update<K extends keyof ProjectFormState>(key: K, value: ProjectFormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
@@ -177,9 +174,7 @@ export function ProjectsPanel({ data }: { data: ProjectsData }) {
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-1 truncate text-sm text-muted">
-                    {project.summary}
-                  </p>
+                  <p className="mt-1 truncate text-sm text-muted">{project.summary}</p>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -367,9 +362,7 @@ export function ProjectsPanel({ data }: { data: ProjectsData }) {
               <Input
                 type="number"
                 value={form.order}
-                onChange={(event) =>
-                  update("order", Number(event.target.value) || 0)
-                }
+                onChange={(event) => update("order", Number(event.target.value) || 0)}
               />
             </Field>
             <div className="flex items-center justify-between rounded-xl border border-line px-4 py-3">
@@ -398,9 +391,7 @@ export function ProjectsPanel({ data }: { data: ProjectsData }) {
             <Field label="SEO description">
               <Input
                 value={form.seoDescription}
-                onChange={(event) =>
-                  update("seoDescription", event.target.value)
-                }
+                onChange={(event) => update("seoDescription", event.target.value)}
               />
             </Field>
           </div>

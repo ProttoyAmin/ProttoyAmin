@@ -1,6 +1,6 @@
 "use client";
 
-import { Database, Images, Inbox, Layers, PenLine, Wrench } from "lucide-react";
+import { Database, Images, Inbox, Layers, PenLine, Wrench } from "@/components/ui/icons";
 import * as React from "react";
 
 import { Alert } from "@/components/ui/alert";
@@ -34,8 +34,7 @@ export function OverviewPanel({ data }: { data: OverviewData }) {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
         <p className="mt-1 text-sm text-muted">
-          Signed in as {data.owner.email} — you have full control over the site
-          content.
+          Signed in as {data.owner.email} — you have full control over the site content.
         </p>
       </header>
 
@@ -53,33 +52,31 @@ export function OverviewPanel({ data }: { data: OverviewData }) {
         <Alert tone="danger" title="The database is unreachable">
           {data.runtime.db.error}
           <span className="mt-1 block text-xs">
-            The site is serving demo content from the local driver. Add valid
-            Atlas credentials to <code>MONGODB_URI</code> and restart to connect.
+            The site is serving demo content from the local driver. Add valid Atlas
+            credentials to <code>MONGODB_URI</code> and restart to connect.
           </span>
         </Alert>
       ) : null}
 
       {!data.runtime.configured.mongo ? (
         <Alert tone="warning" title="Running in demo mode">
-          <code>MONGODB_URI</code> is not set, so content is stored in a local
-          JSON file (<code>.data/db.json</code>). Everything else works exactly
-          the same.
+          <code>MONGODB_URI</code> is not set, so content is stored in a local JSON file (
+          <code>.data/db.json</code>). Everything else works exactly the same.
         </Alert>
       ) : null}
 
       {demoCollections.length > 0 ? (
         <Alert tone="info" title="Showing demo content">
-          {demoCollections.map((entry) => entry.label).join(", ")} still use
-          placeholder content. Publish your own to replace it — the demo entries
-          disappear automatically.
+          {demoCollections.map((entry) => entry.label).join(", ")} still use placeholder
+          content. Publish your own to replace it — the demo entries disappear
+          automatically.
         </Alert>
       ) : null}
 
       {!data.runtime.configured.cloudinary ? (
         <Alert tone="info" title="Local media storage">
-          Cloudinary credentials are missing, so uploads are stored on the
-          local disk. Add <code>CLOUDINARY_*</code> variables to switch to the
-          cloud.
+          Cloudinary credentials are missing, so uploads are stored on the local disk. Add{" "}
+          <code>CLOUDINARY_*</code> variables to switch to the cloud.
         </Alert>
       ) : null}
 
@@ -92,9 +89,7 @@ export function OverviewPanel({ data }: { data: OverviewData }) {
                 <Icon className="h-5 w-5" />
               </span>
               <div>
-                <p className="text-2xl font-semibold tracking-tight">
-                  {stat.value}
-                </p>
+                <p className="text-2xl font-semibold tracking-tight">{stat.value}</p>
                 <p className="text-xs uppercase tracking-wider text-muted">
                   {stat.label}
                 </p>
@@ -110,8 +105,7 @@ export function OverviewPanel({ data }: { data: OverviewData }) {
         </h2>
         {data.audit.length === 0 ? (
           <Card className="mt-3 text-sm text-muted">
-            No admin activity recorded yet. Every change you make is logged
-            here.
+            No admin activity recorded yet. Every change you make is logged here.
           </Card>
         ) : (
           <ul className="mt-3 divide-y divide-line overflow-hidden rounded-2xl border border-line">
@@ -125,9 +119,7 @@ export function OverviewPanel({ data }: { data: OverviewData }) {
                     <span className="font-medium">{entry.action}</span>{" "}
                     <span className="text-muted">on {entry.entity}</span>
                   </p>
-                  <p className="truncate text-xs text-muted">
-                    {entry.actorEmail}
-                  </p>
+                  <p className="truncate text-xs text-muted">{entry.actorEmail}</p>
                 </div>
                 <span className="shrink-0 text-xs text-muted">
                   <RelativeTime value={entry.at} />

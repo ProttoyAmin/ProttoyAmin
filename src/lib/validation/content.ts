@@ -37,11 +37,16 @@ export const projectInputSchema = z.object({
   published: booleanish.default(true),
   order: z.number().int().min(0).max(9999).default(0),
   metrics: z
-    .array(z.object({ label: z.string().trim().max(60), value: z.string().trim().max(60) }))
+    .array(
+      z.object({ label: z.string().trim().max(60), value: z.string().trim().max(60) }),
+    )
     .max(6)
     .default([]),
   seo: z
-    .object({ title: z.string().trim().max(160).default(""), description: z.string().trim().max(320).default("") })
+    .object({
+      title: z.string().trim().max(160).default(""),
+      description: z.string().trim().max(320).default(""),
+    })
     .default({ title: "", description: "" }),
 });
 
@@ -98,7 +103,10 @@ export const postInputSchema = z.object({
   tags: stringListSchema.default([]),
   published: booleanish.default(false),
   seo: z
-    .object({ title: z.string().trim().max(160).default(""), description: z.string().trim().max(320).default("") })
+    .object({
+      title: z.string().trim().max(160).default(""),
+      description: z.string().trim().max(320).default(""),
+    })
     .default({ title: "", description: "" }),
 });
 
@@ -142,6 +150,20 @@ export const settingsInputSchema = z.object({
     secondaryCtaHref: z.string().trim().max(300).default(""),
     portraitUrl: z.string().trim().max(1000).default(""),
     portraitAlt: z.string().trim().max(200).default(""),
+    primaryBadge: z
+      .object({
+        enabled: booleanish.default(true),
+        label: z.string().trim().max(60).default("Currently"),
+        value: z.string().trim().max(100).default("Building products"),
+      })
+      .default({ enabled: true, label: "Currently", value: "Building products" }),
+    secondaryBadge: z
+      .object({
+        enabled: booleanish.default(true),
+        label: z.string().trim().max(60).default("Stack"),
+        value: z.string().trim().max(100).default("React · Go · MongoDB"),
+      })
+      .default({ enabled: true, label: "Stack", value: "React · Go · MongoDB" }),
   }),
   socials: z.array(socialLinkSchema).max(12).default([]),
   theme: z.object({
@@ -154,6 +176,11 @@ export const settingsInputSchema = z.object({
       .regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, "Use a hex colour like #6d4aff")
       .max(40)
       .default("#6d4aff"),
+    fontFamily: z
+      .enum(["inter", "manrope", "dm-sans", "space-grotesk"])
+      .default("manrope"),
+    fontScale: z.enum(["compact", "comfortable", "spacious"]).default("comfortable"),
+    bubbleStyle: z.enum(["rounded", "pill", "soft-square"]).default("pill"),
   }),
   features: z.object({
     contactEnabled: booleanish.default(true),

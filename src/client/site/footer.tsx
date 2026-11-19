@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
+import { ArrowUp } from "@/components/ui/icons";
 import * as React from "react";
 
 import { socialIcon } from "@/client/site/icons";
@@ -55,8 +55,8 @@ export function SiteFooter({
 
       <div className="mx-auto mt-8 w-full max-w-6xl px-5 sm:px-8">
         <p className="text-xs text-muted">
-          © {new Date().getFullYear()} {name}. Built with Next.js, MongoDB and
-          Framer Motion.
+          © {new Date().getFullYear()} {name}. Built with Next.js, MongoDB and Framer
+          Motion.
         </p>
       </div>
     </footer>

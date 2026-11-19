@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, MailOpen, Reply, Trash2 } from "lucide-react";
+import { Mail, MailOpen, Reply, Trash2 } from "@/components/ui/icons";
 import * as React from "react";
 
 import { useServerAction } from "@/client/admin/use-server-action";
@@ -9,10 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/client/admin/relative-time";
-import {
-  deleteMessageAction,
-  markMessageReadAction,
-} from "@/server/actions/admin";
+import { deleteMessageAction, markMessageReadAction } from "@/server/actions/admin";
 
 export function MessagesPanel({ data }: { data: MessagesData }) {
   const { pending, run } = useServerAction();
@@ -60,11 +57,7 @@ export function MessagesPanel({ data }: { data: MessagesData }) {
         <ul className="space-y-3">
           {messages.map((message) => (
             <li key={message.id}>
-              <Card
-                className={
-                  message.read ? "" : "border-accent/40 bg-accent-soft/40"
-                }
-              >
+              <Card className={message.read ? "" : "border-accent/40 bg-accent-soft/40"}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">

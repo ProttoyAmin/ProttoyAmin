@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check } from "@/components/ui/icons";
 import * as React from "react";
 
 import { Field, Input } from "@/components/ui/input";
@@ -75,17 +75,11 @@ export function AppearancePicker({
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
                   style={{ backgroundColor: preset.accent }}
                 >
-                  {selected ? (
-                    <Check className="h-4 w-4 text-white" />
-                  ) : null}
+                  {selected ? <Check className="h-4 w-4 text-white" /> : null}
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium">
-                    {preset.label}
-                  </span>
-                  <span className="block truncate text-xs text-muted">
-                    {preset.hint}
-                  </span>
+                  <span className="block text-sm font-medium">{preset.label}</span>
+                  <span className="block truncate text-xs text-muted">{preset.hint}</span>
                 </span>
               </button>
             );

@@ -29,7 +29,7 @@ Open <http://localhost:3000> for the portfolio and
 | Password | `portfolio-admin` (or `ADMIN_PASSWORD`) |
 
 > The password is hashed with bcrypt on first boot and never stored in plain
-> text. Change it from **Admin → Settings → Change password**, or run
+> text. Change it from **Admin → Settings → Password & security**, or run
 > `pnpm run admin:reset -- "your-new-password"`.
 
 Without any credentials the site still works end to end:
@@ -85,25 +85,47 @@ single page. Each one is a real route, so it can be bookmarked and reloaded.
 | `/admin/writing` | CRUD for blog posts |
 | `/admin/messages` | The contact-form inbox |
 | `/admin/media` | The asset library and uploads |
-| `/admin/settings` | Site copy, **appearance**, profile picture, account security |
+| `/admin/settings` | General site identity, social links, feature switches and SEO |
+| `/admin/settings/appearance/theme` | Accent, light/dark default, typography, reading scale and floating-card shape |
+| `/admin/settings/appearance/hero` | Hero copy, profile picture and the two floating-card labels/content |
+| `/admin/settings/security` | Password changes |
+| `/admin/settings/ownership` | Owner transfer |
 
-### Change the look from the admin
+### Appearance and hero settings
 
-`/admin/settings` → **Appearance** lets you:
+The appearance pages save independently, so changing a hero image does not
+require saving unrelated site settings:
 
-- pick one of three themes — **Violet**, **Maroon** or **Emerald** — and see
-  it applied live, before you save;
-- type any hex colour if you want something else;
-- choose whether a first-time visitor sees the light or the dark theme.
+- **Settings → Appearance → Theme** (`/admin/settings/appearance/theme`):
+  choose Violet, Maroon, Emerald or a custom hex accent; set the default
+  light/dark mode; preview Manrope, DM Sans, Space Grotesk or Inter; adjust
+  reading scale; and choose the floating hero-card shape (rounded, pill or
+  soft square).
+- **Settings → Appearance → Hero** (`/admin/settings/appearance/hero`):
+  edit the hero text and calls to action, upload/pick the portrait, and
+  configure or hide each floating information card.
+- **Settings → General** (`/admin/settings`): site identity, social links,
+  feature switches and SEO metadata.
+- **Settings → Password & security** and **Ownership** keep account actions
+  in their own pages.
 
-The chosen colour is stored in `settings.theme.accent` and applied as a CSS
-variable, so the light and the dark theme are both derived from it.
+Unsaved edits show a persistent bottom snackbar. Save or discard before
+leaving; attempted route changes are blocked and the page gives a short
+shake as feedback. Browser refresh/close also gets the standard unsaved-work
+warning.
+
+The chosen accent is stored in `settings.theme.accent` and applied as a CSS
+variable, so both light and dark palettes derive from it. Typography and
+shape choices are persisted under `settings.theme`; the two hero cards are
+saved under `settings.hero.primaryBadge` and `settings.hero.secondaryBadge`.
+
+---
 
 ### Change the profile picture
 
-`/admin/settings` → **Hero** → **Profile picture**: upload a new image or
-pick one from the media library, then press **Save settings**. The picture
-appears in the hero of the public page.
+**Settings → Appearance → Hero → Portrait**: upload a new image or choose one
+from the media library, then save that page. The picture appears in the
+public hero.
 
 ---
 

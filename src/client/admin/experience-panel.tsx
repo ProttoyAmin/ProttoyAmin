@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "@/components/ui/icons";
 import * as React from "react";
 
 import { ImagePicker } from "@/client/admin/image-picker";
@@ -12,10 +12,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { Sheet } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import {
-  deleteExperienceAction,
-  saveExperienceAction,
-} from "@/server/actions/admin";
+import { deleteExperienceAction, saveExperienceAction } from "@/server/actions/admin";
 import { formatDateRange } from "@/lib/format";
 import type { Experience, ImageAsset } from "@/server/types";
 
@@ -75,10 +72,7 @@ export function ExperiencePanel({ data }: { data: ExperienceData }) {
     setOpen(true);
   }
 
-  function update<K extends keyof ExperienceForm>(
-    key: K,
-    value: ExperienceForm[K],
-  ) {
+  function update<K extends keyof ExperienceForm>(key: K, value: ExperienceForm[K]) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
@@ -205,9 +199,7 @@ export function ExperiencePanel({ data }: { data: ExperienceData }) {
             <Field label="Employment type">
               <Input
                 value={form.employmentType}
-                onChange={(event) =>
-                  update("employmentType", event.target.value)
-                }
+                onChange={(event) => update("employmentType", event.target.value)}
                 placeholder="Full-time"
               />
             </Field>
@@ -261,9 +253,7 @@ export function ExperiencePanel({ data }: { data: ExperienceData }) {
               <Input
                 type="number"
                 value={form.order}
-                onChange={(event) =>
-                  update("order", Number(event.target.value) || 0)
-                }
+                onChange={(event) => update("order", Number(event.target.value) || 0)}
               />
             </Field>
             <div className="flex items-center justify-between rounded-xl border border-line px-4 py-3">

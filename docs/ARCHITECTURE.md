@@ -146,7 +146,7 @@ src/app/(admin)/admin/
     ├── writing/          # /admin/writing
     ├── messages/         # /admin/messages
     ├── media/            # /admin/media
-    └── settings/         # /admin/settings
+    └── settings/         # /admin/settings; general, appearance, security and ownership routes
 ```
 
 The route group `(workspace)` keeps the sign-in page outside the workspace
@@ -156,7 +156,8 @@ layout, so the login screen never renders behind the sidebar.
   and each page loads only the collection it renders.
 - The sidebar navigates with real `<Link>` elements, so every section is
   bookmarkable, linkable and reloadable.
-- Each tab is a client component; create/edit happens in a **slide-over** editor with no page navigation.
+- Each content route is a client panel; create/edit happens in a **slide-over** editor with no page navigation.
+- Settings are separate pages (general, appearance/theme, appearance/hero, security and ownership). The shared workspace guard presents a bottom save/discard snackbar, blocks internal route links while settings are dirty, shakes the page on a blocked attempt, and uses the browser's beforeunload warning for refresh/close.
 - Mutations are Server Actions (`src/server/actions/admin.ts`). Each action re-validates the payload with Zod, calls `requireOwner()`, writes through the repository, records an audit entry, updates the `site-content` cache tag and revalidates `/` and `/admin`; the client then calls `router.refresh()`.
 - The admin navigation is a real list of links with `aria-current="page"` on
   the active entry.
@@ -170,6 +171,9 @@ The owner controls the look from **Admin → Settings → Appearance**:
 |---|---|---|
 | Default theme | `settings.theme.default` | The theme a first-time visitor sees; the sun/moon button always works. |
 | Accent colour | `settings.theme.accent` | The accent used everywhere. |
+| Font | `settings.theme.fontFamily` | Manrope, DM Sans, Space Grotesk or Inter. |
+| Reading size | `settings.theme.fontScale` | Compact, comfortable or spacious. |
+| Floating-card shape | `settings.theme.bubbleStyle` | Rounded, pill or soft square. |
 
 The accent is stored as a hex value and applied as the CSS variable
 `--accent-base` in the root layout. `globals.css` derives the two shades
@@ -184,9 +188,11 @@ One colour therefore works in **both** themes — the light theme darkens it
 for contrast on white, the dark theme lightens it for contrast on black.
 
 Three presets ship in `src/lib/theme.ts` (Violet, Maroon, Emerald); the
-owner can also type any hex value. The picker applies the colour to the
-live document while the owner is editing, so the change is visible before
-it is saved.
+owner can also type any hex value. The picker applies the colour and typography preview to the live document
+while the owner is editing, so changes are visible before they are saved.
+The Appearance → Hero page controls the two floating image cards, their
+labels/content and whether either is shown; all settings subsections save
+independently.
 
 ---
 
