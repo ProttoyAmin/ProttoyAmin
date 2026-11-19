@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import {
   createContext,
   useCallback,
@@ -34,13 +35,14 @@ function subscribe(listener: () => void) {
   };
 }
 
-/** Reads the persisted preference; falls back to the OS preference. */
-function getSnapshot(): Theme {
+/**
+ * Reads the persisted preference; falls back to the theme the owner
+ * configured in the admin panel.
+ */
+function getSnapshot(fallback: Theme): Theme {
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: light)").matches
-    ? "light"
-    : "dark";
+  return fallback;
 }
 
 /** The server always renders the dark theme; the inline script corrects it. */
@@ -48,8 +50,25 @@ function getServerSnapshot(): Theme {
   return "dark";
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+export function ThemeProvider({
+  children,
+  defaultTheme = "dark",
+}: {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+}) {
+  // The snapshot function must keep a stable identity, otherwise React
+  // re-subscribes to the store on every render.
+  const getClientSnapshot = React.useCallback(
+    () => getSnapshot(defaultTheme),
+    [defaultTheme],
+  );
+
+  const theme = useSyncExternalStore(
+    subscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
 
   // Keep the document in sync with the selected theme.
   useEffect(() => {
@@ -65,10 +84,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     // Flip the *effective* theme. Reading localStorage directly would be a
-    // no-op for a first-time visitor whose OS preference is already light.
-    const next = getSnapshot() === "dark" ? "light" : "dark";
+    // no-op for a first-time visitor whose theme is already light.
+    const next = getSnapshot(defaultTheme) === "dark" ? "light" : "dark";
     setTheme(next);
-  }, [setTheme]);
+  }, [defaultTheme, setTheme]);
 
   const value = useMemo(
     () => ({ theme, setTheme, toggleTheme }),

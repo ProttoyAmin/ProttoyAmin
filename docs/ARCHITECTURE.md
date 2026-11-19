@@ -10,7 +10,7 @@
 
 ### Goals
 1. A **single-page** public portfolio (`/`) — modern, minimal, animation-rich but restrained.
-2. A **tabbed admin panel** (`/admin`) where the owner uploads and manages every piece of content.
+2. An **admin panel** (`/admin/**`) where the owner uploads and manages every piece of content — one page per concern.
 3. **Strict ownership**: only the account named in `settings.ownerEmail` may enter the admin panel. No other account, no role, no email, ever.
 4. **Production-ready**: typed end-to-end, tested, CI-gated, deployable to Vercel with no code changes.
 5. **Runs with zero cloud credentials**: a local memory/file driver backs dev, CI and preview environments, so the repo clones and runs without Atlas or Cloudinary accounts.
@@ -129,12 +129,64 @@ compiler.
 - Because it is one page, SEO is concentrated: `metadata` API, JSON-LD `Person` + `CreativeWork` per project, `sitemap.ts`, `robots.ts`, OG image generated at build via `opengraph-image.tsx`.
 
 ### Admin
-- Route group `(admin)` → `/admin` shell with a **tab switcher** (Overview, Projects, Experience, Skills, Writing, Messages, Media, Settings).
-- The page is a server component: it verifies ownership, loads every collection in parallel and hands plain data to the client shell.
+
+The admin is **multi-page**; only the public portfolio is a single page.
+
+```
+src/app/(admin)/admin/
+├── layout.tsx            # minimal wrapper
+├── login/page.tsx        # /admin/login — no chrome, no ownership check
+├── access-denied.tsx     # shared "not the owner" screen
+└── (workspace)/
+    ├── layout.tsx        # ownership gate + sidebar chrome
+    ├── page.tsx          # /admin            → Overview
+    ├── projects/         # /admin/projects
+    ├── experience/       # /admin/experience
+    ├── skills/           # /admin/skills
+    ├── writing/          # /admin/writing
+    ├── messages/         # /admin/messages
+    ├── media/            # /admin/media
+    └── settings/         # /admin/settings
+```
+
+The route group `(workspace)` keeps the sign-in page outside the workspace
+layout, so the login screen never renders behind the sidebar.
+
+- Every page is a server component: the workspace layout verifies ownership,
+  and each page loads only the collection it renders.
+- The sidebar navigates with real `<Link>` elements, so every section is
+  bookmarkable, linkable and reloadable.
 - Each tab is a client component; create/edit happens in a **slide-over** editor with no page navigation.
 - Mutations are Server Actions (`src/server/actions/admin.ts`). Each action re-validates the payload with Zod, calls `requireOwner()`, writes through the repository, records an audit entry, updates the `site-content` cache tag and revalidates `/` and `/admin`; the client then calls `router.refresh()`.
-- The admin tabs are a real ARIA tablist (`role="tablist"` / `role="tab"` / `role="tabpanel"`), so keyboard and screen-reader navigation behave correctly.
+- The admin navigation is a real list of links with `aria-current="page"` on
+  the active entry.
 - Every form control is wrapped in `Field`, which generates an id and links the `<label>` to the control — the labels are programmatically associated, not just visual.
+
+### Appearance
+
+The owner controls the look from **Admin → Settings → Appearance**:
+
+| Setting | Stored in | Effect |
+|---|---|---|
+| Default theme | `settings.theme.default` | The theme a first-time visitor sees; the sun/moon button always works. |
+| Accent colour | `settings.theme.accent` | The accent used everywhere. |
+
+The accent is stored as a hex value and applied as the CSS variable
+`--accent-base` in the root layout. `globals.css` derives the two shades
+the design system actually uses from it:
+
+```css
+:root      { --accent: color-mix(in oklab, var(--accent-base) 92%, #000); }  /* light */
+.dark      { --accent: color-mix(in oklab, var(--accent-base) 88%, #fff); }  /* dark */
+```
+
+One colour therefore works in **both** themes — the light theme darkens it
+for contrast on white, the dark theme lightens it for contrast on black.
+
+Three presets ship in `src/lib/theme.ts` (Violet, Maroon, Emerald); the
+owner can also type any hex value. The picker applies the colour to the
+live document while the owner is editing, so the change is visible before
+it is saved.
 
 ---
 

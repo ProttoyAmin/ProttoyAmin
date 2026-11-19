@@ -5,7 +5,7 @@ import * as React from "react";
 
 import { ImagePicker } from "@/client/admin/image-picker";
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { ExperienceData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -65,7 +65,7 @@ function toForm(experience?: Experience): ExperienceForm {
   };
 }
 
-export function ExperiencePanel({ data }: { data: AdminData }) {
+export function ExperiencePanel({ data }: { data: ExperienceData }) {
   const { pending, run } = useServerAction();
   const [open, setOpen] = React.useState(false);
   const [form, setForm] = React.useState<ExperienceForm>(EMPTY);

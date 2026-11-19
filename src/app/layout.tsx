@@ -7,6 +7,8 @@ import "./globals.css";
 
 import { AppProviders } from "@/client/providers/app-providers";
 import { themeScript } from "@/lib/theme-script";
+import { normalizeAccent } from "@/lib/theme";
+import { getCachedSiteContent } from "@/server/services/site-content-cache";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -49,6 +51,25 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Reads the appearance the owner configured. A database problem must never
+ * stop the site from rendering, so any failure falls back to the defaults.
+ */
+async function loadAppearance(): Promise<{
+  accent: string;
+  defaultTheme: "dark" | "light";
+}> {
+  try {
+    const { settings } = await getCachedSiteContent();
+    return {
+      accent: normalizeAccent(settings.theme?.accent),
+      defaultTheme: settings.theme?.default === "light" ? "light" : "dark",
+    };
+  } catch {
+    return { accent: normalizeAccent(undefined), defaultTheme: "dark" };
+  }
+}
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -65,13 +86,28 @@ export default async function RootLayout({
   // script must carry it or the browser blocks it.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
+  // The accent colour the owner picked in Admin → Settings. It is applied
+  // as a CSS variable so the same colour drives the site *and* the admin
+  // panel, in both the light and the dark theme.
+  const { accent, defaultTheme } = await loadAppearance();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{ __html: themeScript(defaultTheme) }}
+        />
+        {/* The accent the owner picked. A style rule (rather than an inline
+            style attribute) lets the admin preview override it live. */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `:root{--accent-base:${accent}}`,
+          }}
+        />
       </head>
       <body className="min-h-dvh bg-background font-sans text-foreground antialiased">
-        <AppProviders>{children}</AppProviders>
+        <AppProviders defaultTheme={defaultTheme}>{children}</AppProviders>
       </body>
     </html>
   );

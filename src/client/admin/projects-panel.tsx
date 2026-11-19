@@ -5,7 +5,7 @@ import * as React from "react";
 
 import { ImagePicker } from "@/client/admin/image-picker";
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { ProjectsData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -77,7 +77,7 @@ function toFormState(project?: Project): ProjectFormState {
   };
 }
 
-export function ProjectsPanel({ data }: { data: AdminData }) {
+export function ProjectsPanel({ data }: { data: ProjectsData }) {
   const { pending, run } = useServerAction();
   const [open, setOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Project | undefined>();

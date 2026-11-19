@@ -5,10 +5,10 @@ import * as React from "react";
 
 import { Alert } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
-import type { AdminData } from "@/client/admin/types";
+import type { OverviewData } from "@/client/admin/types";
 import { formatRelativeTime } from "@/lib/format";
 
-export function OverviewPanel({ data }: { data: AdminData }) {
+export function OverviewPanel({ data }: { data: OverviewData }) {
   const stats = [
     { label: "Projects", value: data.projects.length, icon: Layers },
     { label: "Experience", value: data.experiences.length, icon: Wrench },

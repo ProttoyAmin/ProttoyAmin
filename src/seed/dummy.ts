@@ -69,7 +69,7 @@ export const DUMMY_SETTINGS: SiteSettings = {
   ],
   theme: {
     default: "dark",
-    accent: "#7c5cff",
+    accent: "#6d4aff",
   },
   features: {
     contactEnabled: true,

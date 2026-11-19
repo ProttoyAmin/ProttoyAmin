@@ -4,7 +4,7 @@ import { Mail, MailOpen, Reply, Trash2 } from "lucide-react";
 import * as React from "react";
 
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { MessagesData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -14,7 +14,7 @@ import {
   markMessageReadAction,
 } from "@/server/actions/admin";
 
-export function MessagesPanel({ data }: { data: AdminData }) {
+export function MessagesPanel({ data }: { data: MessagesData }) {
   const { pending, run } = useServerAction();
   const [filter, setFilter] = React.useState<"all" | "unread">("all");
 

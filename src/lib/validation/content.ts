@@ -146,7 +146,14 @@ export const settingsInputSchema = z.object({
   socials: z.array(socialLinkSchema).max(12).default([]),
   theme: z.object({
     default: z.enum(["dark", "light"]).default("dark"),
-    accent: z.string().trim().max(40).default("#7c5cff"),
+    // Any hex colour — the admin panel offers three presets but the owner
+    // may type their own.
+    accent: z
+      .string()
+      .trim()
+      .regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, "Use a hex colour like #6d4aff")
+      .max(40)
+      .default("#6d4aff"),
   }),
   features: z.object({
     contactEnabled: booleanish.default(true),

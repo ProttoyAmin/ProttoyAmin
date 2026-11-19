@@ -4,19 +4,22 @@ import { KeyRound, Plus, Shield, Trash2 } from "lucide-react";
 import * as React from "react";
 
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import { AppearancePicker } from "@/client/admin/appearance-picker";
+import { ImagePicker } from "@/client/admin/image-picker";
+import type { SettingsData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field, Input, Label, Textarea } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/cn";
 import {
   changePasswordAction,
   saveSettingsAction,
   transferOwnershipAction,
 } from "@/server/actions/admin";
-import type { SocialLink } from "@/server/types";
+import type { ImageAsset, SocialLink } from "@/server/types";
 
-export function SettingsPanel({ data }: { data: AdminData }) {
+export function SettingsPanel({ data }: { data: SettingsData }) {
   const { pending, run } = useServerAction();
   const settings = data.settings;
 
@@ -36,6 +39,17 @@ export function SettingsPanel({ data }: { data: AdminData }) {
     newPassword: "",
   });
 
+  // The portrait is an image asset, so it is managed with the same picker
+  // as the project covers — upload a new one or pick from the library.
+  const [portrait, setPortrait] = React.useState<ImageAsset | undefined>(() =>
+    settings.hero.portraitUrl
+      ? {
+          url: settings.hero.portraitUrl,
+          alt: settings.hero.portraitAlt,
+        }
+      : undefined,
+  );
+
   const [transfer, setTransfer] = React.useState({
     email: "",
     currentPassword: "",
@@ -46,6 +60,18 @@ export function SettingsPanel({ data }: { data: AdminData }) {
     value: (typeof form.hero)[K],
   ) {
     setForm((current) => ({ ...current, hero: { ...current.hero, [key]: value } }));
+  }
+
+  function setPortraitImage(value: ImageAsset | undefined) {
+    setPortrait(value);
+    setForm((current) => ({
+      ...current,
+      hero: {
+        ...current.hero,
+        portraitUrl: value?.url ?? "",
+        portraitAlt: value?.alt ?? current.hero.portraitAlt,
+      },
+    }));
   }
 
   function setSeo<K extends keyof typeof form.seo>(
@@ -178,12 +204,13 @@ export function SettingsPanel({ data }: { data: AdminData }) {
             />
           </Field>
         </div>
-        <Field label="Portrait URL">
-          <Input
-            value={form.hero.portraitUrl}
-            onChange={(event) => setHero("portraitUrl", event.target.value)}
-          />
-        </Field>
+        <ImagePicker
+          label="Profile picture"
+          value={portrait}
+          onChange={setPortraitImage}
+          library={data.media}
+          folder="profile"
+        />
         <Field label="Portrait alt text">
           <Input
             value={form.hero.portraitAlt}
@@ -259,31 +286,49 @@ export function SettingsPanel({ data }: { data: AdminData }) {
       </Card>
 
       <Card className="space-y-4">
-        <Label>Theme &amp; features</Label>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Default theme">
-            <Input
-              value={form.theme.default}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  theme: { ...current.theme, default: event.target.value as "dark" | "light" },
-                }))
-              }
-            />
-          </Field>
-          <Field label="Accent colour">
-            <Input
-              value={form.theme.accent}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  theme: { ...current.theme, accent: event.target.value },
-                }))
-              }
-            />
-          </Field>
-        </div>
+        <Label>Appearance</Label>
+        <Field
+          label="Default theme"
+          hint="The theme a first-time visitor sees. Everyone can still switch with the sun/moon button."
+        >
+          <div className="flex gap-2">
+            {(["dark", "light"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() =>
+                  setForm((current) => ({
+                    ...current,
+                    theme: { ...current.theme, default: option },
+                  }))
+                }
+                aria-pressed={form.theme.default === option}
+                className={cn(
+                  "rounded-xl border px-4 py-2 text-sm capitalize transition-colors",
+                  form.theme.default === option
+                    ? "border-accent bg-accent-soft text-foreground"
+                    : "border-line text-muted hover:text-foreground",
+                )}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </Field>
+
+        <AppearancePicker
+          accent={form.theme.accent}
+          onChange={(value) =>
+            setForm((current) => ({
+              ...current,
+              theme: { ...current.theme, accent: value },
+            }))
+          }
+        />
+      </Card>
+
+      <Card className="space-y-4">
+        <Label>Features</Label>
 
         <div className="flex items-center justify-between rounded-xl border border-line px-4 py-3">
           <span className="text-sm">Contact form enabled</span>

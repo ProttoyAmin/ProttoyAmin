@@ -25,3 +25,30 @@ export interface AdminData {
   demo: DemoFlags;
   runtime: RuntimeStatus;
 }
+
+/**
+ * Each admin page is its own route and only loads the data it needs, so
+ * every panel declares exactly the slice it renders.
+ */
+export type OverviewData = Pick<
+  AdminData,
+  | "owner"
+  | "projects"
+  | "experiences"
+  | "skills"
+  | "posts"
+  | "messages"
+  | "media"
+  | "audit"
+  | "runtime"
+> & { demo: DemoFlags };
+
+export type ProjectsData = Pick<AdminData, "projects" | "media"> & {
+  demo: Pick<DemoFlags, "projects">;
+};
+export type ExperienceData = Pick<AdminData, "experiences" | "media">;
+export type SkillsData = Pick<AdminData, "skills">;
+export type WritingData = Pick<AdminData, "posts" | "media">;
+export type MessagesData = Pick<AdminData, "messages">;
+export type MediaData = Pick<AdminData, "media" | "runtime">;
+export type SettingsData = Pick<AdminData, "settings" | "owner" | "media">;

@@ -45,8 +45,8 @@ piece of content.
 ### Quick start
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 - Portfolio → <http://localhost:3000>

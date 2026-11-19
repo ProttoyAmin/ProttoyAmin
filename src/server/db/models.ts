@@ -81,7 +81,7 @@ const settingsSchema = new Schema(
     },
     theme: {
       default: { type: String, enum: ["dark", "light"], default: "dark" },
-      accent: { type: String, default: "#7c5cff" },
+      accent: { type: String, default: "#6d4aff" },
     },
     features: {
       contactEnabled: { type: Boolean, default: true },

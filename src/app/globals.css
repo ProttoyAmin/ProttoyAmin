@@ -9,8 +9,11 @@
   --line: #e3e3ea;
   --foreground: #0b0b12;
   --muted: #5c5c6b;
-  --accent: #6d4aff;
-  --accent-soft: #6d4aff1f;
+  /* The owner picks this in Admin → Settings → Appearance. */
+  --accent-base: #6d4aff;
+  /* Derived per theme so a single accent works in light *and* dark. */
+  --accent: color-mix(in oklab, var(--accent-base) 92%, #000);
+  --accent-soft: color-mix(in oklab, var(--accent-base) 12%, transparent);
   --success: #0f9d58;
   --danger: #e5484d;
   --radius: 14px;
@@ -23,8 +26,9 @@
   --line: #23232f;
   --foreground: #f3f3f6;
   --muted: #9c9cad;
-  --accent: #8b6cff;
-  --accent-soft: #8b6cff26;
+  /* Lighten for contrast against the dark background. */
+  --accent: color-mix(in oklab, var(--accent-base) 88%, #fff);
+  --accent-soft: color-mix(in oklab, var(--accent-base) 15%, transparent);
   --success: #35c07d;
   --danger: #ff6369;
 }

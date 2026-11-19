@@ -13,25 +13,17 @@ import {
   Sun,
   Wrench,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
-import { useRouter } from "next/navigation";
 
 import { useTheme } from "@/client/providers/theme-provider";
 import { Button } from "@/components/ui/button";
-import { ADMIN_TABS, type AdminTabId } from "@/lib/constants";
+import { ADMIN_NAV, type AdminNavId } from "@/lib/constants";
 import { cn } from "@/lib/cn";
-import type { AdminData } from "@/client/admin/types";
+import type { AdminUser } from "@/server/types";
 
-import { OverviewPanel } from "@/client/admin/overview-panel";
-import { ProjectsPanel } from "@/client/admin/projects-panel";
-import { ExperiencePanel } from "@/client/admin/experience-panel";
-import { SkillsPanel } from "@/client/admin/skills-panel";
-import { WritingPanel } from "@/client/admin/writing-panel";
-import { MessagesPanel } from "@/client/admin/messages-panel";
-import { MediaPanel } from "@/client/admin/media-panel";
-import { SettingsPanel } from "@/client/admin/settings-panel";
-
-const ICONS: Record<AdminTabId, React.ElementType> = {
+const ICONS: Record<AdminNavId, React.ElementType> = {
   overview: LayoutDashboard,
   projects: FolderOpen,
   experience: Sparkles,
@@ -42,18 +34,33 @@ const ICONS: Record<AdminTabId, React.ElementType> = {
   settings: Settings,
 };
 
-export function AdminShell({ data }: { data: AdminData }) {
-  const [tab, setTab] = React.useState<AdminTabId>("overview");
+/**
+ * The admin chrome.
+ *
+ * Every section is its own route — the shell only renders the navigation
+ * and hands the page through.
+ */
+export function AdminShell({
+  owner,
+  unread,
+  children,
+}: {
+  owner: AdminUser;
+  unread: number;
+  children: React.ReactNode;
+}) {
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
-
-  const unread = data.messages.filter((message) => !message.read).length;
+  const pathname = usePathname();
 
   async function signOut() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
     router.replace("/admin/login");
     router.refresh();
   }
+
+  const isActive = (href: string) =>
+    href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
@@ -65,30 +72,25 @@ export function AdminShell({ data }: { data: AdminData }) {
           </span>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">Portfolio admin</p>
-            <p className="truncate text-xs text-muted">{data.owner.email}</p>
+            <p className="truncate text-xs text-muted">{owner.email}</p>
           </div>
         </div>
 
         <nav
-          role="tablist"
           aria-label="Admin sections"
-          className="flex-1 space-y-1 px-3"
+          className="flex-1 space-y-1 overflow-y-auto px-3"
         >
-          {ADMIN_TABS.map((item) => {
+          {ADMIN_NAV.map((item) => {
             const Icon = ICONS[item.id];
-            const isActive = tab === item.id;
+            const active = isActive(item.href);
             return (
-              <button
+              <Link
                 key={item.id}
-                type="button"
-                role="tab"
-                id={`admin-tab-${item.id}`}
-                aria-selected={isActive}
-                aria-controls={`admin-panel-${item.id}`}
-                onClick={() => setTab(item.id)}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
-                  isActive
+                  active
                     ? "bg-surface-2 font-medium text-foreground"
                     : "text-muted hover:bg-surface-2/60 hover:text-foreground",
                 )}
@@ -100,7 +102,7 @@ export function AdminShell({ data }: { data: AdminData }) {
                     {unread}
                   </span>
                 ) : null}
-              </button>
+              </Link>
             );
           })}
         </nav>
@@ -125,7 +127,7 @@ export function AdminShell({ data }: { data: AdminData }) {
         </div>
       </aside>
 
-      {/* Mobile tab bar */}
+      {/* Mobile nav */}
       <div className="sticky top-0 z-30 border-b border-line bg-background/95 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <p className="text-sm font-semibold">Portfolio admin</p>
@@ -147,50 +149,35 @@ export function AdminShell({ data }: { data: AdminData }) {
             </Button>
           </div>
         </div>
-        <div
-          role="tablist"
+        <nav
           aria-label="Admin sections"
           className="flex gap-1 overflow-x-auto px-3 pb-3"
         >
-          {ADMIN_TABS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              id={`admin-tab-mobile-${item.id}`}
-              aria-selected={tab === item.id}
-              aria-controls={`admin-panel-${item.id}`}
-              onClick={() => setTab(item.id)}
-              className={cn(
-                "shrink-0 rounded-full px-3 py-1.5 text-xs transition-colors",
-                tab === item.id
-                  ? "bg-accent text-white"
-                  : "border border-line text-muted",
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+          {ADMIN_NAV.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1.5 text-xs transition-colors",
+                  active
+                    ? "bg-accent text-white"
+                    : "border border-line text-muted",
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* Content */}
+      {/* Page */}
       <main className="flex-1">
-        <div
-          role="tabpanel"
-          id={`admin-panel-${tab}`}
-          aria-labelledby={`admin-tab-${tab}`}
-          tabIndex={0}
-          className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8"
-        >
-          {tab === "overview" ? <OverviewPanel data={data} /> : null}
-          {tab === "projects" ? <ProjectsPanel data={data} /> : null}
-          {tab === "experience" ? <ExperiencePanel data={data} /> : null}
-          {tab === "skills" ? <SkillsPanel data={data} /> : null}
-          {tab === "writing" ? <WritingPanel data={data} /> : null}
-          {tab === "messages" ? <MessagesPanel data={data} /> : null}
-          {tab === "media" ? <MediaPanel data={data} /> : null}
-          {tab === "settings" ? <SettingsPanel data={data} /> : null}
+        <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8">
+          {children}
         </div>
       </main>
     </div>

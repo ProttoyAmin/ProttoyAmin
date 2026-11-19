@@ -4,7 +4,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import * as React from "react";
 
 import { useServerAction } from "@/client/admin/use-server-action";
-import type { AdminData } from "@/client/admin/types";
+import type { SkillsData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -33,7 +33,7 @@ const EMPTY: SkillForm = {
   order: 0,
 };
 
-export function SkillsPanel({ data }: { data: AdminData }) {
+export function SkillsPanel({ data }: { data: SkillsData }) {
   const { pending, run } = useServerAction();
   const [open, setOpen] = React.useState(false);
   const [form, setForm] = React.useState<SkillForm>(EMPTY);
