@@ -1,3 +1,8 @@
+# This repository is a single package, but pnpm 10 expects the workspace
+# file to declare its packages.
+packages:
+  - "."
+
 allowBuilds:
   esbuild: false
 minimumReleaseAgeExclude:

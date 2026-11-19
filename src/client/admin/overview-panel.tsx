@@ -6,7 +6,7 @@ import * as React from "react";
 import { Alert } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import type { OverviewData } from "@/client/admin/types";
-import { formatRelativeTime } from "@/lib/format";
+import { RelativeTime } from "@/client/admin/relative-time";
 
 export function OverviewPanel({ data }: { data: OverviewData }) {
   const stats = [
@@ -130,7 +130,7 @@ export function OverviewPanel({ data }: { data: OverviewData }) {
                   </p>
                 </div>
                 <span className="shrink-0 text-xs text-muted">
-                  {formatRelativeTime(entry.at)}
+                  <RelativeTime value={entry.at} />
                 </span>
               </li>
             ))}

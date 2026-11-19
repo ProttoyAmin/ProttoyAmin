@@ -14,8 +14,8 @@ pnpm install
 pnpm dev
 ```
 
-> The project is pinned to **pnpm 9** (`packageManager` in `package.json`).
-> `corepack enable` gives you the right version automatically. `pnpm install`
+> The project is pinned to **pnpm 10** (`packageManager` in `package.json`).
+> `corepack enable` gives you the right version automatically. `npm install`
 > also works, but the lockfile of record is `pnpm-lock.yaml`.
 
 Open <http://localhost:3000> for the portfolio and

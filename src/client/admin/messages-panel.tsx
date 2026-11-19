@@ -8,7 +8,7 @@ import type { MessagesData } from "@/client/admin/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { formatRelativeTime } from "@/lib/format";
+import { RelativeTime } from "@/client/admin/relative-time";
 import {
   deleteMessageAction,
   markMessageReadAction,
@@ -88,7 +88,7 @@ export function MessagesPanel({ data }: { data: MessagesData }) {
                       {message.body}
                     </p>
                     <p className="mt-2 text-xs text-muted">
-                      {formatRelativeTime(message.createdAt)}
+                      <RelativeTime value={message.createdAt} />
                     </p>
                   </div>
 
