@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs><linearGradient id="og" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#08080b"/><stop offset="100%" stop-color="#1b1033"/></linearGradient></defs>
+  <rect width="1200" height="630" fill="url(#og)"/>
+  <circle cx="1050" cy="120" r="220" fill="#7c5cff" fill-opacity="0.28"/>
+  <circle cx="120" cy="560" r="180" fill="#22d3ee" fill-opacity="0.22"/>
+  <text x="90" y="300" fill="#ffffff" font-size="76" font-weight="700" font-family="ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Prottoy Amin</text>
+  <text x="90" y="372" fill="#a1a1ad" font-size="34" font-family="ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Full-stack engineer — product, platform, applied ML.</text>
+</svg>
