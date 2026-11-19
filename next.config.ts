@@ -1,27 +1,10 @@
 import type { NextConfig } from "next";
 
 /**
- * Security headers applied to every response.
- * The CSP uses per-request nonces for Next.js inline scripts.
+ * The Content-Security-Policy is generated per request in `src/proxy.ts`
+ * (it carries a nonce, so it cannot live here as a static header).
+ * The remaining security headers are static and belong in this file.
  */
-const isDev = process.env.NODE_ENV !== "production";
-
-const csp = [
-  "default-src 'self'",
-  `script-src 'self' 'strict-dynamic'${isDev ? " 'unsafe-eval' 'unsafe-inline'" : ""}`,
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com data:",
-  "img-src 'self' data: blob: https://res.cloudinary.com",
-  "media-src 'self' https://res.cloudinary.com",
-  "connect-src 'self' https://api.cloudinary.com https://*.mongodb.net",
-  "frame-src 'none'",
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "object-src 'none'",
-  "upgrade-insecure-requests",
-].join("; ");
-
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -41,7 +24,6 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: [
-          { key: "Content-Security-Policy", value: csp },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

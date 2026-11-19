@@ -372,7 +372,7 @@ export const DUMMY_EXPERIENCES: Experience[] = [
 
 export const DUMMY_SKILLS: Skill[] = [
   { name: "React", category: "Frontend", icon: "⚛️", proficiency: 5, published: true, order: 1, isDummy: true, id: "300000000000000000000001", createdAt: now, updatedAt: now },
-  { name: "Next.js", category: "Frontend", icon: "▲", proficiency: 5, published: true, order: 2, isDummy: true, id: "300000000000000000000001", createdAt: now, updatedAt: now },
+  { name: "Next.js", category: "Frontend", icon: "▲", proficiency: 5, published: true, order: 2, isDummy: true, id: "300000000000000000000005", createdAt: now, updatedAt: now },
   { name: "TypeScript", category: "Frontend", icon: "🟦", proficiency: 5, published: true, order: 3, isDummy: true, id: "300000000000000000000002", createdAt: now, updatedAt: now },
   { name: "Tailwind CSS", category: "Frontend", icon: "🎨", proficiency: 5, published: true, order: 4, isDummy: true, id: "300000000000000000000003", createdAt: now, updatedAt: now },
   { name: "React Query", category: "Frontend", icon: "🔁", proficiency: 4, published: true, order: 5, isDummy: true, id: "300000000000000000000004", createdAt: now, updatedAt: now },

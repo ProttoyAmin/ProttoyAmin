@@ -1,12 +1,13 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { requireOwner } from "@/server/auth/owner";
 import { getRepositories } from "@/server/db/registry";
 import { isAppError } from "@/server/errors";
 import { recordAudit } from "@/server/services/audit.service";
+import { CONTENT_CACHE_TAG } from "@/server/services/site-content-cache";
 import { slugify } from "@/lib/slug";
 import { readingTime } from "@/lib/format";
 import {
@@ -36,6 +37,9 @@ function fail(error: unknown): ActionResult {
 }
 
 function revalidate() {
+  // `updateTag` gives read-your-own-writes: a publish is visible on the
+  // very next public request.
+  updateTag(CONTENT_CACHE_TAG);
   revalidatePath("/");
   revalidatePath("/admin");
 }

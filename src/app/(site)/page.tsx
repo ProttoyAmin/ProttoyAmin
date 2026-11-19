@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
 import { About } from "@/client/site/about";
 import { Contact } from "@/client/site/contact";
@@ -9,15 +10,13 @@ import { SiteNav } from "@/client/site/nav";
 import { Projects } from "@/client/site/projects";
 import { Skills } from "@/client/site/skills";
 import { getRuntimeStatus } from "@/server/db/registry";
-import {
-  getSiteContent,
-  groupSkillsByCategory,
-} from "@/server/services/content.service";
+import { groupSkillsByCategory } from "@/server/services/content.service";
+import { getCachedSiteContent } from "@/server/services/site-content-cache";
 
-export const revalidate = 300;
+
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { settings } = await getSiteContent();
+  const { settings } = await getCachedSiteContent();
   return {
     title: settings.siteTitle || "Prottoy Amin — Software Engineer",
     description: settings.description,
@@ -27,8 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
+  // The page carries a per-request CSP nonce, so it must be rendered per
+  // request. `connection()` opts out of static generation explicitly.
+  await connection();
+
   const { settings, projects, experiences, skills, posts, demo } =
-    await getSiteContent();
+    await getCachedSiteContent();
   const runtime = getRuntimeStatus();
 
   const groups = groupSkillsByCategory(skills);

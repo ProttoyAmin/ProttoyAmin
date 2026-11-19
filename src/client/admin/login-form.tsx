@@ -4,15 +4,19 @@ import { motion } from "motion/react";
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
 import * as React from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 
-export function LoginForm() {
+export function LoginForm({
+  next = "/admin",
+  disabled = false,
+}: {
+  next?: string;
+  disabled?: boolean;
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/admin";
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -87,6 +91,7 @@ export function LoginForm() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
+              disabled={disabled}
             />
           </Field>
 
@@ -99,6 +104,7 @@ export function LoginForm() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
+              disabled={disabled}
             />
           </Field>
 
@@ -108,7 +114,7 @@ export function LoginForm() {
             </p>
           ) : null}
 
-          <Button type="submit" className="mt-6 w-full" disabled={pending}>
+          <Button type="submit" className="mt-6 w-full" disabled={pending || disabled}>
             {pending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" /> Signing in…

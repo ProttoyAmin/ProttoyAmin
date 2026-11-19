@@ -101,7 +101,8 @@ src/
 │   ├── db/                         # connection, models, adapters, registry
 │   ├── media/                      # storage contract + cloudinary/local drivers
 │   ├── repositories/               # repository contracts + factory
-│   ├── services/                   # content resolution, audit log
+│   ├── security/                   # CSP construction
+│   ├── services/                   # content resolution, audit log, tagged cache
 │   └── types.ts                    # domain entities
 ├── lib/                            # isomorphic helpers (cn, slug, format, zod schemas, media urls)
 ├── seed/dummy.ts                   # demo dataset
@@ -122,14 +123,18 @@ compiler.
 ### Public one-pager
 - Server Component root reads all collections **in parallel** via the repository layer.
 - Sections are pure server components; only isolated interactive islands are client components (nav scroll-spy, theme toggle, project filter, contact form, animated counters).
-- `export const revalidate = 300` → ISR. Admin publishes trigger `revalidatePath('/')` + `revalidateTag('portfolio')` so changes appear without redeploy.
+- The page is rendered **per request** (`await connection()`), because it carries a per-request CSP nonce — a cached page would replay a stale nonce and the browser would block every script.
+- The database read is wrapped in a **tagged** Next.js data cache (`src/server/services/site-content-cache.ts`, tag `site-content`). Every admin mutation calls `updateTag('site-content')`, so a publish is visible on the very next public request — no redeploy, no stale window.
+- Admin publishes additionally trigger `revalidatePath('/')` and `revalidatePath('/admin')`.
 - Because it is one page, SEO is concentrated: `metadata` API, JSON-LD `Person` + `CreativeWork` per project, `sitemap.ts`, `robots.ts`, OG image generated at build via `opengraph-image.tsx`.
 
 ### Admin
 - Route group `(admin)` → `/admin` shell with a **tab switcher** (Overview, Projects, Experience, Skills, Writing, Messages, Media, Settings).
 - The page is a server component: it verifies ownership, loads every collection in parallel and hands plain data to the client shell.
 - Each tab is a client component; create/edit happens in a **slide-over** editor with no page navigation.
-- Mutations are Server Actions (`src/server/actions/admin.ts`). Each action re-validates the payload with Zod, calls `requireOwner()`, writes through the repository, records an audit entry and revalidates `/` and `/admin`; the client then calls `router.refresh()`.
+- Mutations are Server Actions (`src/server/actions/admin.ts`). Each action re-validates the payload with Zod, calls `requireOwner()`, writes through the repository, records an audit entry, updates the `site-content` cache tag and revalidates `/` and `/admin`; the client then calls `router.refresh()`.
+- The admin tabs are a real ARIA tablist (`role="tablist"` / `role="tab"` / `role="tabpanel"`), so keyboard and screen-reader navigation behave correctly.
+- Every form control is wrapped in `Field`, which generates an id and links the `<label>` to the control — the labels are programmatically associated, not just visual.
 
 ---
 
@@ -206,7 +211,7 @@ Consequences:
 3. `users.role === 'owner'` for that user document.
 
 Enforcement points:
-- `src/proxy.ts` (the Next 16 network boundary) — a coarse routing gate for `/admin/**`: unauthenticated visitors are redirected to `/admin/login`; authenticated ones pass through.
+- `src/proxy.ts` (the Next 16 network boundary) — two jobs: it generates the per-request CSP nonce that Next.js stamps onto every script, and it acts as a coarse routing gate for `/admin/**` (unauthenticated visitors are redirected to `/admin/login`). It never gates a public route.
 - `requireOwner()` in the admin page and in **every** server action and admin route handler — it re-reads `settings.ownerEmail` and the user document on each call, so a stale cookie, a deleted account or an ownership transfer takes effect immediately.
 - The client-side `AdminShell` hides admin UI, but this is cosmetic only — never a security boundary.
 
@@ -219,7 +224,7 @@ The pure decision function (`evaluateOwnership`) is unit tested in
 - Login rate limit: 5 attempts / 15 min / IP+email (in-memory token bucket, Redis-ready interface).
 - Optional TOTP 2FA (`otpauth`) — enable flag in settings.
 - CSRF: mutating endpoints require the `Origin` header to match `NEXT_PUBLIC_SITE_URL`; `SameSite=Lax` cookies back this up.
-- Security headers: strict `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, HSTS.
+- Security headers: a nonce-based `Content-Security-Policy` built per request in `src/proxy.ts` (see `src/server/security/csp.ts`), plus `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, HSTS. The nonce is mandatory: without it the browser blocks every bundle and the page never hydrates.
 - Audit log: every admin mutation writes `{ actor, action, entity, entityId, at, ip }` to `auditLogs`.
 
 ---

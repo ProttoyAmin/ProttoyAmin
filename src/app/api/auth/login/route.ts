@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { ensureOwnerUser } from "@/server/auth/bootstrap";
+import { isSessionSecretConfigured } from "@/server/auth/token";
 import { verifyPassword } from "@/server/auth/password";
 import {
   clientIpFromHeaders,
@@ -28,6 +29,19 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid credentials" },
       { status: 422 },
+    );
+  }
+
+  // A missing session secret is a configuration problem, not a bad
+  // password. Report it as such so the owner sees what to fix.
+  if (!isSessionSecretConfigured()) {
+    return NextResponse.json(
+      {
+        error:
+          "Admin sign-in is disabled because SESSION_SECRET is not configured. Set it in the environment and restart the server.",
+        code: "session_secret_missing",
+      },
+      { status: 503 },
     );
   }
 

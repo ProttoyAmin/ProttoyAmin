@@ -39,6 +39,16 @@ export function OverviewPanel({ data }: { data: AdminData }) {
         </p>
       </header>
 
+      {data.runtime.issues.length > 0 ? (
+        <Alert tone="danger" title="Configuration required">
+          <ul className="list-disc space-y-1 pl-4">
+            {data.runtime.issues.map((issue) => (
+              <li key={issue}>{issue}</li>
+            ))}
+          </ul>
+        </Alert>
+      ) : null}
+
       {data.runtime.db.error ? (
         <Alert tone="danger" title="The database is unreachable">
           {data.runtime.db.error}

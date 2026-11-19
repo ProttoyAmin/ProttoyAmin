@@ -9,7 +9,7 @@ import * as React from "react";
 
 import { Magnetic } from "@/components/motion/magnetic";
 import { Reveal } from "@/components/motion/reveal";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { socialIcon } from "@/client/site/icons";
 import type { SocialLink } from "@/server/types";
 
@@ -45,6 +45,10 @@ export function Hero({
 }) {
   const reduce = useReducedMotion();
 
+  /**
+   * Upgrades an in-page link to a smooth scroll. Real anchors keep the
+   * calls to action working even before hydration.
+   */
   const scrollTo = (href: string) => {
     if (href.startsWith("#")) {
       const element = document.getElementById(href.slice(1));
@@ -55,6 +59,15 @@ export function Hero({
       return;
     }
     window.location.href = href;
+  };
+
+  const handleCta = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (!href.startsWith("#")) return; // let the browser follow the link
+    event.preventDefault();
+    scrollTo(href);
   };
 
   return (
@@ -112,18 +125,25 @@ export function Hero({
             className="mt-8 flex flex-wrap items-center gap-3"
           >
             <Magnetic>
-              <Button size="lg" onClick={() => scrollTo(ctaHref || "#work")}>
+              <ButtonLink
+                size="lg"
+                href={ctaHref || "#work"}
+                onClick={(event) => handleCta(event, ctaHref || "#work")}
+              >
                 {ctaLabel || "View my work"}
                 <ArrowUpRight className="h-4 w-4" />
-              </Button>
+              </ButtonLink>
             </Magnetic>
-            <Button
+            <ButtonLink
               size="lg"
               variant="outline"
-              onClick={() => scrollTo(secondaryCtaHref || "#contact")}
+              href={secondaryCtaHref || "#contact"}
+              onClick={(event) =>
+                handleCta(event, secondaryCtaHref || "#contact")
+              }
             >
               {secondaryCtaLabel || "Get in touch"}
-            </Button>
+            </ButtonLink>
           </motion.div>
 
           {socials.length > 0 ? (
@@ -211,14 +231,14 @@ export function Hero({
       ) : null}
 
       <div className="mx-auto mt-12 flex w-full max-w-6xl justify-center px-5 sm:px-8">
-        <button
-          type="button"
-          onClick={() => scrollTo("#about")}
+        <a
+          href="#about"
+          onClick={(event) => handleCta(event, "#about")}
           className="group flex flex-col items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:text-foreground"
         >
           Scroll
           <ArrowDown className="h-4 w-4 animate-bounce" />
-        </button>
+        </a>
       </div>
     </section>
   );

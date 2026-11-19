@@ -63,6 +63,9 @@ function resolveCollection<T extends { isDummy: boolean }>(
  *
  * This function never throws: if the database is unreachable the demo
  * content is served so the site still renders.
+ *
+ * The result is not cached here — the cache lives in the Next.js data cache
+ * (see `site-content-cache.ts`) so it can be invalidated per tag.
  */
 export async function getSiteContent(): Promise<SiteContent> {
   try {

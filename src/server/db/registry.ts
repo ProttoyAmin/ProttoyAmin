@@ -5,6 +5,7 @@ import { createMongoAdapter } from "@/server/db/adapters/mongo-adapter";
 import { connectMongo } from "@/server/db/connection";
 import { models } from "@/server/db/models";
 import { env, hasCloudinaryCredentials, hasMongoCredentials } from "@/server/env";
+import { isSessionSecretConfigured } from "@/server/auth/token";
 import { createRepositories, type AdapterBundle } from "@/server/repositories/factory";
 import type { Repositories } from "@/server/repositories/types";
 import type {
@@ -39,6 +40,8 @@ export interface RuntimeStatus {
     cloudinary: boolean;
     sessionSecret: boolean;
   };
+  /** Non-fatal problems the owner must fix to use the admin panel. */
+  issues: string[];
   demo: boolean;
 }
 
@@ -49,8 +52,9 @@ let status: RuntimeStatus = {
   configured: {
     mongo: hasMongoCredentials(),
     cloudinary: hasCloudinaryCredentials(),
-    sessionSecret: Boolean(env.session.secret),
+    sessionSecret: isSessionSecretConfigured(),
   },
+  issues: [],
   demo: true,
 };
 
@@ -59,8 +63,21 @@ export function getRuntimeStatus(): RuntimeStatus {
   const missingCloudinary =
     driver === "cloudinary" && !hasCloudinaryCredentials();
 
+  const issues: string[] = [];
+  if (!status.configured.sessionSecret) {
+    issues.push(
+      "SESSION_SECRET is not set — sign-in is disabled until it is configured.",
+    );
+  }
+  if (!env.admin.password && env.isProduction) {
+    issues.push(
+      "ADMIN_PASSWORD is not set — the owner account cannot be bootstrapped.",
+    );
+  }
+
   return {
     ...status,
+    issues,
     media: {
       driver,
       error: missingCloudinary

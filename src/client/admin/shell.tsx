@@ -69,7 +69,11 @@ export function AdminShell({ data }: { data: AdminData }) {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3">
+        <nav
+          role="tablist"
+          aria-label="Admin sections"
+          className="flex-1 space-y-1 px-3"
+        >
           {ADMIN_TABS.map((item) => {
             const Icon = ICONS[item.id];
             const isActive = tab === item.id;
@@ -77,6 +81,10 @@ export function AdminShell({ data }: { data: AdminData }) {
               <button
                 key={item.id}
                 type="button"
+                role="tab"
+                id={`admin-tab-${item.id}`}
+                aria-selected={isActive}
+                aria-controls={`admin-panel-${item.id}`}
                 onClick={() => setTab(item.id)}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
@@ -139,11 +147,19 @@ export function AdminShell({ data }: { data: AdminData }) {
             </Button>
           </div>
         </div>
-        <div className="flex gap-1 overflow-x-auto px-3 pb-3">
+        <div
+          role="tablist"
+          aria-label="Admin sections"
+          className="flex gap-1 overflow-x-auto px-3 pb-3"
+        >
           {ADMIN_TABS.map((item) => (
             <button
               key={item.id}
               type="button"
+              role="tab"
+              id={`admin-tab-mobile-${item.id}`}
+              aria-selected={tab === item.id}
+              aria-controls={`admin-panel-${item.id}`}
               onClick={() => setTab(item.id)}
               className={cn(
                 "shrink-0 rounded-full px-3 py-1.5 text-xs transition-colors",
@@ -160,7 +176,13 @@ export function AdminShell({ data }: { data: AdminData }) {
 
       {/* Content */}
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8">
+        <div
+          role="tabpanel"
+          id={`admin-panel-${tab}`}
+          aria-labelledby={`admin-tab-${tab}`}
+          tabIndex={0}
+          className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8"
+        >
           {tab === "overview" ? <OverviewPanel data={data} /> : null}
           {tab === "projects" ? <ProjectsPanel data={data} /> : null}
           {tab === "experience" ? <ExperiencePanel data={data} /> : null}

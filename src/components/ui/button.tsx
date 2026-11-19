@@ -43,4 +43,24 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
+export interface ButtonLinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
+    VariantProps<typeof buttonVariants> {}
+
+/**
+ * The anchor twin of `Button`. Use it whenever the target is a URL: real
+ * links keep working without JavaScript and support the usual browser
+ * affordances (middle-click, "copy link", hover preview).
+ */
+export const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
+  ({ className, variant, size, ...props }, ref) => (
+    <a
+      ref={ref}
+      className={cn(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
+  ),
+);
+ButtonLink.displayName = "ButtonLink";
+
 export { buttonVariants };

@@ -37,6 +37,36 @@ Without any credentials the site still works end to end:
 | Email | Messages are stored in the admin inbox, no delivery |
 | Sessions | A development-only signing secret is used (a warning is logged) |
 
+### Production needs `SESSION_SECRET`
+
+`npm run dev` falls back to a built-in development signing secret.
+**`npm run start` (production) does not** — it refuses to sign a session and
+shows a visible banner instead:
+
+> Admin sign-in is disabled because `SESSION_SECRET` is not configured.
+
+Set it before the first production boot:
+
+```bash
+export SESSION_SECRET="$(openssl rand -base64 48)"
+export ADMIN_PASSWORD="a-strong-password"
+npm run build && npm run start
+```
+
+`ADMIN_PASSWORD` bootstraps the owner account on first sign-in. Without it
+production has no owner to sign in as, and the admin panel stays locked.
+
+### Boot commands
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server on <http://localhost:3000> |
+| `npm run build` | Production build |
+| `npm run start` | Production server (requires `SESSION_SECRET`) |
+| `npm run seed:dummy` | Writes the demo content into the configured database |
+| `npm run admin:reset -- "<password>"` | Sets a new owner password |
+| `npm run atlas:provision` | Creates the Atlas cluster, database and indexes |
+
 ---
 
 ## 2. Connect MongoDB Atlas

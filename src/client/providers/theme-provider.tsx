@@ -64,8 +64,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    const next =
-      window.localStorage.getItem(STORAGE_KEY) === "light" ? "dark" : "light";
+    // Flip the *effective* theme. Reading localStorage directly would be a
+    // no-op for a first-time visitor whose OS preference is already light.
+    const next = getSnapshot() === "dark" ? "light" : "dark";
     setTheme(next);
   }, [setTheme]);
 
